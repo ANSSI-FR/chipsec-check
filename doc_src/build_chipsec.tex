@@ -1,0 +1,115 @@
+\hypertarget{usb-key-building-for-chipsec-and-secureboot-checks-v0.1-042019}{%
+\section{USB KEY BUILDING FOR CHIPSEC AND SECUREBOOT CHECKS v0.1
+(04/2019)}\label{usb-key-building-for-chipsec-and-secureboot-checks-v0.1-042019}}
+
+\begin{verbatim}
+A Help to build your own ChipSec and SecureBoot USB keys
+\end{verbatim}
+
+\hypertarget{final-usb-keys}{%
+\subsection{Final USB keys}\label{final-usb-keys}}
+
+\begin{itemize}
+\tightlist
+\item
+  \textbf{USB KEY 1} : live Debian distribution to launch
+  \textbf{ChipSec} from the computer to analyze
+\item
+  \textbf{USB KEY 2} : contains \textbf{SecureBoot} keys to import, tool
+  to import your own trust keys and to check importation
+\end{itemize}
+
+\hypertarget{linux-tools-to-install-before-generating-the-usb-keys}{%
+\subsection{Linux Tools to install before generating the USB
+keys}\label{linux-tools-to-install-before-generating-the-usb-keys}}
+
+\begin{verbatim}
+    sudo apt-get install debootstrap
+    sudo apt-get install sbsigntool
+    sudo apt-get install efitools
+\end{verbatim}
+
+\hypertarget{tool-to-build-the-usb-keys-create-keys.sh}{%
+\subsection{Tool to build the usb keys :
+create-keys.sh}\label{tool-to-build-the-usb-keys-create-keys.sh}}
+
+\hypertarget{before-launching}{%
+\subsubsection{Before launching}\label{before-launching}}
+
+\begin{itemize}
+\tightlist
+\item
+  define ``mount\_point'' variable (path to mount point) into
+  ``create-shell.sh'' file
+\item
+  ensure that path ``mount\_point'' is empty and available
+\end{itemize}
+
+\hypertarget{build-usb-key-1}{%
+\subsubsection{Build USB KEY 1}\label{build-usb-key-1}}
+
+Plug a new usb key (attached on /dev/sdc in this case).
+
+\begin{verbatim}
+./create-keys.sh /dev/sdc -
+\end{verbatim}
+
+Unplug the usb key.
+
+\hypertarget{build-usb-key-2}{%
+\subsubsection{Build USB KEY 2}\label{build-usb-key-2}}
+
+Plug a new usb key (attached on /dev/sdc in this case).
+
+\begin{verbatim}
+./create-keys.sh - /dev/sdc
+\end{verbatim}
+
+Unplug the usb key.
+
+\hypertarget{boot-on-keys}{%
+\subsection{Boot on keys}\label{boot-on-keys}}
+
+\begin{itemize}
+\item
+  Plug one of keys, start the computer.
+\item
+  For USB KEY 1 :
+
+  \begin{itemize}
+  \tightlist
+  \item
+    1/ boot on usb key, start linux live
+  \item
+    2/ from root terminal, launch ChipSec with ``chipsec\_main.py''.
+  \end{itemize}
+\item
+  For USB KEY 2 :
+
+  \begin{itemize}
+  \tightlist
+  \item
+    1/ boot on usb key and launch EFI binaries from EFI shell (Shell.efi
+    is automaticaly started).
+  \item
+    OR interrupt the normal boot to select a shell EFI from Boot
+    Configuration and launch EFI binaries from EFI shell.
+  \item
+    2/ launching of binaries from EFI shell :
+
+    \begin{itemize}
+    \tightlist
+    \item
+      Before to launch the binaries, it is imperative to identify the
+      usb key letter storing the binaries with commmands ``fs0'' or
+      ``fs1'' or fsX \ldots{} then ``dir''
+    \item
+      After disabling of SecureBoot and enabling of Setup Mode (with
+      BIOS options) : launch ``KeyTool.efi'' to import trust keys.
+    \item
+      After re-enabling of SecureBoot and disabling of Setupe Mode (with
+      BIOS options) : launch ``HelloWorld.efi'' (signed with imported
+      Trust Keys) to check the good importation of trust keys.
+    \end{itemize}
+  \end{itemize}
+\end{itemize}

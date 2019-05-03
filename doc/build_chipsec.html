@@ -1,0 +1,45 @@
+<h1 id="usb-key-building-for-chipsec-and-secureboot-checks-v0.1-042019">USB KEY BUILDING FOR CHIPSEC AND SECUREBOOT CHECKS v0.1 (04/2019)</h1>
+<pre><code>A Help to build your own ChipSec and SecureBoot USB keys</code></pre>
+<h2 id="final-usb-keys">Final USB keys</h2>
+<ul>
+<li><strong>USB KEY 1</strong> : live Debian distribution to launch <strong>ChipSec</strong> from the computer to analyze</li>
+<li><strong>USB KEY 2</strong> : contains <strong>SecureBoot</strong> keys to import, tool to import your own trust keys and to check importation</li>
+</ul>
+<h2 id="linux-tools-to-install-before-generating-the-usb-keys">Linux Tools to install before generating the USB keys</h2>
+<pre><code>    sudo apt-get install debootstrap
+    sudo apt-get install sbsigntool
+    sudo apt-get install efitools</code></pre>
+<h2 id="tool-to-build-the-usb-keys-create-keys.sh">Tool to build the usb keys : create-keys.sh</h2>
+<h3 id="before-launching">Before launching</h3>
+<ul>
+<li>define “mount_point” variable (path to mount point) into “create-shell.sh” file</li>
+<li>ensure that path “mount_point” is empty and available</li>
+</ul>
+<h3 id="build-usb-key-1">Build USB KEY 1</h3>
+<p>Plug a new usb key (attached on /dev/sdc in this case).</p>
+<pre><code>./create-keys.sh /dev/sdc -</code></pre>
+<p>Unplug the usb key.</p>
+<h3 id="build-usb-key-2">Build USB KEY 2</h3>
+<p>Plug a new usb key (attached on /dev/sdc in this case).</p>
+<pre><code>./create-keys.sh - /dev/sdc</code></pre>
+<p>Unplug the usb key.</p>
+<h2 id="boot-on-keys">Boot on keys</h2>
+<ul>
+<li><p>Plug one of keys, start the computer.</p></li>
+<li><p>For USB KEY 1 :</p>
+<ul>
+<li>1/ boot on usb key, start linux live</li>
+<li>2/ from root terminal, launch ChipSec with “chipsec_main.py”.</li>
+</ul></li>
+<li><p>For USB KEY 2 :</p>
+<ul>
+<li>1/ boot on usb key and launch EFI binaries from EFI shell (Shell.efi is automaticaly started).</li>
+<li>OR interrupt the normal boot to select a shell EFI from Boot Configuration and launch EFI binaries from EFI shell.</li>
+<li>2/ launching of binaries from EFI shell :
+<ul>
+<li>Before to launch the binaries, it is imperative to identify the usb key letter storing the binaries with commmands “fs0” or “fs1” or fsX … then “dir”</li>
+<li>After disabling of SecureBoot and enabling of Setup Mode (with BIOS options) : launch “KeyTool.efi” to import trust keys.</li>
+<li>After re-enabling of SecureBoot and disabling of Setupe Mode (with BIOS options) : launch “HelloWorld.efi” (signed with imported Trust Keys) to check the good importation of trust keys.</li>
+</ul></li>
+</ul></li>
+</ul>

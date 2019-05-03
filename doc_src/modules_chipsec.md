@@ -5,6 +5,44 @@ A Help to interpret modules output
 ```
 
 
+## Valid summary output
+At the end of ChipSec execution, the last lines present you a summary to indicate quickly if the tests are passed or not. 
+
+In case one or more modules are not PASSED as the following sample :
+
+~~~
+[CHIPSEC] ***************************  SUMMARY  ***************************
+[CHIPSEC] Time elapsed            0.145
+[CHIPSEC] Modules total           23
+[+] PASSED: chipsec.modules.common.smm
+[+] PASSED: chipsec.modules.common.ia32cfg
+[+] PASSED: chipsec.modules.common.spi_lock
+[+] PASSED: chipsec.modules.common.memlock
+[+] PASSED: chipsec.modules.common.bios_kbrd_buffer
+[+] PASSED: chipsec.modules.common.spi_fdopss
+[+] PASSED: chipsec.modules.common.bios_ts
+[+] PASSED: chipsec.modules.remap
+[+] PASSED: chipsec.modules.memconfig
+[+] PASSED: chipsec.modules.common.bios_smi
+[+] PASSED: chipsec.modules.common.bios_wp
+[+] PASSED: chipsec.modules.common.me_mfg_mode
+[+] PASSED: chipsec.modules.common.smrr
+[+] PASSED: chipsec.modules.common.spi_desc
+[+] PASSED: chipsec.modules.common.spi_access
+[+] PASSED: chipsec.modules.smm_dma
+[+] PASSED: chipsec.modules.common.rtclock
+[+] PASSED: chipsec.modules.common.cpu.spectre_v2
+[+] PASSED: chipsec.modules.common.secureboot.variables
+[+] PASSED: chipsec.modules.common.uefi.access_uefispec
+[+] PASSED: chipsec.modules.common.uefi.s3bootscript
+[+] PASSED: chipsec.modules.debugenabled
+[+] PASSED: chipsec.modules.common.sgx_check
+~~~
+
+please to refer you to module section associated in the rest of this document.
+
+
+
 ## Module chipsec.modules.common.spi_fdopss
 ### Description
 This module checks for SPI Controller Flash Descriptor Security Override Pin Strap (FDOPSS). On some systems, this may be routed to a jumper on the motherboard and allow to override Flash Descriptor Security or to enable Intel ME Debug mode
