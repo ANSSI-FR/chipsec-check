@@ -20,6 +20,10 @@ A Help to build your own ChipSec and SecureBoot USB keys
    - define "mount_point" variable (path to mount point) into "create-shell.sh" file
    - ensure that path "mount_point" is empty and available
 
+> **Note:**
+Some sub scripts require access to sudo commands.
+>
+
 ### Build USB KEY 1
 Plug a new usb key (attached on /dev/sdc in this case).
 
