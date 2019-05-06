@@ -121,6 +121,8 @@ install_debian () {
   mount -o bind /dev "${mount_point}"/dev
 
   PATH="$PATH:/usr/sbin:/sbin:/bin" chroot "${mount_point}"/ apt install git systemd build-essential gcc make sed nasm python-setuptools linux-image-amd64 linux-headers-amd64 python python-dev grub-efi
+
+  echo chipsec > ${mount_point}/etc/hostname
   
   echo "UUID=$(get_uuid ${root})         /         ext4      defaults      1      1" > "${mount_point}"/etc/fstab
   echo "UUID=$(get_uuid ${boot})         /boot     vfat      defaults      1      1" >> "${mount_point}"/etc/fstab
