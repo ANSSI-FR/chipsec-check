@@ -16,9 +16,6 @@ A Help to build your own ChipSec and SecureBoot USB keys
 ~~~
 
 ## Tool to build the usb keys : create-keys.sh
-### Before launching 
-   - define "mount_point" variable (path to mount point) into "create-shell.sh" file
-   - ensure that path "mount_point" is empty and available
 
 > **Note:**
 Some sub scripts require access to sudo commands.
