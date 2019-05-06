@@ -165,8 +165,7 @@ umount_debian () {
 
 main () {
   disk="${1}"
-  mount_point="/home/arnaud/Documents/DAE/tooling/mnt"
-  mkdir "${mount_point}"
+  mount_point=$(mktemp -d -p "" efiliveXXX)
   #if [[ ! -f "${disk}" ]]
   #then
   #  echo "${1} is not a file"
@@ -198,6 +197,8 @@ main () {
   install_chipsec
 
   umount_debian
+
+  rmdir ${mount_point}
 }
 
 main ${1}

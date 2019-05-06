@@ -27,7 +27,7 @@ install_ca () {
     mkdir "${mount_point}"/keytool
     cp ca/*.auth ca/*.esl "${mount_point}"/keytool
     mkdir "${mount_point}"/builtin
-    cp ca/*.cer "${mount_point}"builtin
+    cp ca/*.cer "${mount_point}"/builtin
 }
 
 install_shell () {
@@ -51,8 +51,7 @@ install_key_tool () {
 
 main () {
     target="${1}"
-    mount_point="./mnt"
-    mkdir "${mount_point}"
+    mount_point=$(mktemp -d -p "" efishellXXX)
     part_disk "${target}"
     format_key "${target}"
 
@@ -61,6 +60,7 @@ main () {
     install_shell
     install_key_tool
     umount_key
+    rmdir "${mount_point}"
 }
 
 main "${1}"
