@@ -28,7 +28,7 @@ Some sub scripts require access to sudo commands.
 Plug a new usb key (attached on /dev/sdc in this case).
 
 ~~~
-./create-keys.sh /dev/sdc -
+./create-keys.sh live /dev/sdc
 ~~~
 
 Unplug the usb key.
@@ -38,7 +38,7 @@ Unplug the usb key.
 Plug a new usb key (attached on /dev/sdc in this case).
 
 ~~~
-./create-keys.sh - /dev/sdc
+./create-keys.sh shell /dev/sdc
 ~~~
 
 Unplug the usb key.
