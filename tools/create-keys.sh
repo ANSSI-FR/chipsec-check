@@ -18,7 +18,7 @@ main () {
     command=${1}
     device=${2}
 
-    generate_keys
+    [ -f ca/myGUID.txt ] || generate_keys
 
     case "$command" in
       live)
