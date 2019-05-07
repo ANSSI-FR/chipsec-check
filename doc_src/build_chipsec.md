@@ -41,16 +41,30 @@ Plug a new usb key (attached on /dev/sdc in this case).
 Unplug the usb key.
 
 ## Boot on keys
-   - Plug one of keys, start the computer.
-   
-   - For USB KEY 1 : 
-      - 1/ boot on usb key, start linux live
-      - 2/ from root terminal, launch ChipSec with "chipsec_main.py".
 
-   - For USB KEY 2 :
-      - 1/ boot on usb key and launch EFI binaries from EFI shell (Shell.efi is automaticaly started).
-      - OR interrupt the normal boot to select a shell EFI from Boot Configuration and launch EFI binaries from EFI shell.
-      - 2/ launching of binaries from EFI shell :
-      	 - Before to launch the binaries, it is imperative to identify the usb key letter storing the binaries with commmands "fs0" or "fs1" or fsX ... then "dir"
-         - After disabling of SecureBoot and enabling of Setup Mode (with BIOS options) : launch "KeyTool.efi" to import trust keys.
-         - After re-enabling of SecureBoot and disabling of Setupe Mode (with BIOS options) : launch "HelloWorld.efi" (signed with imported Trust Keys) to check the good importation of trust keys.
+Plug one of keys, start the computer.
+   
+### USB KEY 1
+
+1. boot on the USB key, then at the bootloader prompt start linux live
+1. when finished booting, login as root (no password)
+1. from the root terminal, launch ChipSec with "chipsec_main.py".
+
+### USB KEY 2 :
+
+1. Go the BIOS/Firmware configuration and set the platform to SecureBoot
+   enabled and reset to Setup Mode.
+1. either:
+    - boot on USB key and launch EFI binaries from EFI shell (Shell.efi is
+      automaticaly started).
+    - OR interrupt the normal boot to select a shell EFI from boot configuration
+      and launch EFI binaries from EFI shell.
+1. execute binaries from EFI shell :
+    - identify the USB key letter storing the binaries with commmands "fs0" or
+      "fs1" or fsX ... then "dir"
+    - launch "KeyTool.efi" to import trust keys.
+1. replace (in that order) db, KEK and PK using files from keytool folder
+1. importing the PK will set the platform to User mode
+1. restart the platform:
+    - the shell should run since it's signed with trust anchor to the PK
+    - HelloWorld.efi should not run since it's unsigned
