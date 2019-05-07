@@ -1,0 +1,19 @@
+# Environnement de test des exigences matérielles
+
+Ce dépôt contient des outils et la documentation permettant de vérifier la
+configuration matérielle d'une plate-forme x86 et en particulier la sécurité de
+celle-ci.
+
+Le but de ce dépôt est de faciliter la vérification d'exigences de sécurité
+matérielles, par exemple lors de la commande de plate-formes de type PC par
+l'État français.
+
+Les outils fournis permettent de construire deux clés USB bootable:
+
+- la première repose sur l'outil [chipsec](https://github.com/chipsec/chipsec)
+  édité par Intel et qui permet l'inspection d'un certain nombre de registre de
+	configuration.  Chipsec est intégré au sein d'une distribution Linux Debian.
+- la seconde repose sur l'outil keytool.efi qui sert à inspecter et modifier la
+  liste des clés utilisées dans le cadre de _SecureBoot_. Cette clé USB permet
+	de valider que la plateforme peut être configurée avec des clés _SecureBoot_
+	personnalisées.
