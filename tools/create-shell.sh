@@ -42,11 +42,11 @@ install_key_tool () {
     KEFI="${mount_point}/KeyTool.EFI"
     HEFI="${mount_point}/HelloWorld.EFI"
 
-    cp bin/KeyTool.efi "${KEFI}.tmp"
+    cp /usr/lib/efitools/x86_64-linux-gnu/KeyTool.efi "${KEFI}.tmp"
     sbsign --key ca/DB.key --cert ca/DB.crt --output "${KEFI}" "${KEFI}.tmp"
     rm "${KEFI}.tmp"
 
-    cp bin/HelloWorld.efi "${HEFI}"
+    cp /usr/lib/efitools/x86_64-linux-gnu/HashTool.efi "${HEFI}"
 }
 
 main () {
