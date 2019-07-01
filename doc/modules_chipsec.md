@@ -440,8 +440,9 @@ Bit LOCK (0) of each register is checked.
 This module common.bios_wp will fail if SMM-based protection is not correctly configured and SPI protected ranges (PR registers) do not protect the entire BIOS region. 
 
 ### Technical informations 
-- BIOSWE allow to lock writing on Flash SPI Region, BLE to control (SMI interruption) modifications on bit BIOSWE, SMM_BWP prevent writing from kernel space.
-- PR0<=>Desc BIOS Region, PR1<=>BIOS Region, PR2<=>ME Region, PR3<=>GbE Region, PR4<=>PDR Region
+- Bits of BIOS_CNTL register :  BIOSWE allows to lock writing on Flash SPI Region, BLE to control (SMI interruption) modifications on bit BIOSWE, SMM_BWP to prevent writing from kernel space.
+- 5 PR Registers : PR0<=>Desc BIOS Region, PR1<=>BIOS Region, PR2<=>ME Region, PR3<=>GbE Region, PR4<=>PDR Region
+- WP bit of PR Registers protects against modification of BIOS Flash Region.
 
 ### Valid output
 ~~~ 

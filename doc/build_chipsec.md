@@ -60,8 +60,8 @@ Plug one of keys, start the computer.
     - OR interrupt the normal boot to select a shell EFI from boot configuration
       and launch EFI binaries from EFI shell.
 1. execute binaries from EFI shell :
-    - identify the USB key letter storing the binaries with commmands "fs0" or
-      "fs1" or fsX ... then "dir"
+    - identify the USB key letter storing the binaries with commmands "fs0:" or
+      "fs1:" or fsX: ... then "dir"
     - launch "KeyTool.efi" to import trust keys.
 1. replace (in that order) db, KEK and PK using files from keytool folder
 1. importing the PK will set the platform to User mode
