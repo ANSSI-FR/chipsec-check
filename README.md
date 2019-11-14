@@ -6,7 +6,10 @@ configuration of an x86 platform, and especially its security.
 The goal is to facilitate security requirements verification, for example when
 ordering PC platforms for the French administration.
 
-The requirements themselves will be published in a separate document.
+The requirements themselves are published in a [separate
+document](https://www.ssi.gouv.fr/en/guide/hardware-security-requirements-for-x86-platforms/)
+(in [French](https://www.ssi.gouv.fr/guide/exigences-de-securite-materielles/)
+as well)
 
 Provided tools can be used to build two bootable USB keys:
 
