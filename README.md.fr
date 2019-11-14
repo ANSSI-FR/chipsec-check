@@ -8,6 +8,10 @@ Le but de ce dépôt est de faciliter la vérification d'exigences de sécurité
 matérielles, par exemple lors de la commande de plate-formes de type PC par
 l'État français.
 
+Les exigences elles-mêmes sont publiées dans un [document séparé]
+(https://www.ssi.gouv.fr/guide/exigences-de-securite-materielles/) ([version
+anglaise](https://www.ssi.gouv.fr/en/guide/hardware-security-requirements-for-x86-platforms/))
+
 Les outils fournis permettent de construire deux clés USB bootable:
 
 - la première repose sur l'outil [chipsec](https://github.com/chipsec/chipsec)
