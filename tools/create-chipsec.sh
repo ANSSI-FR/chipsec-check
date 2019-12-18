@@ -187,6 +187,12 @@ main () {
 
 	install_chipsec
 
+	# Install the dump_system script if possible
+	if [ -f $(dirname $0)/dump_system.sh ];
+	then
+		cp $(dirname $0)/dump_system.sh ${mount_point}/root/
+	fi
+
 	umount_debian
 
 	rmdir ${mount_point}
