@@ -3,11 +3,31 @@ set -e
 
 check_requirements() {
 	local ret=0
-	[ -x /sbin/parted ] || echo "parted not found, please install the parted package" >&2 && ret=1
-	[ -x /sbin.mkfs.vfat ] || echo "mkfs.vfat not found, please install the dosfstools package" >&2 && ret=1
-	[ -x /usr/bin/sbsign ] || echo "sbsign not found, please install the sbsigntool package" >&2 && ret=1
-	[ -f /usr/lib/efitools/x86_64-linux-gnu/KeyTool.efi ] || echo "KeyTool.efi not found, please install the efitools package" >&2 && ret=1
-	[ -f /usr/lib/efitools/x86_64-linux-gnu/HashTool.efi ] || echo "HashTool.efi not found, please install the efitools package" >&2 && ret=1
+	if [ ! -x /sbin/parted ];
+	then
+		echo "parted not found, please install the parted package" >&2
+		ret=1
+	fi
+	if [ ! -x /sbin/mkfs.vfat ];
+	then
+		echo "mkfs.vfat not found, please install the dosfstools package" >&2
+		ret=1
+	fi
+	if [ ! -x /usr/bin/sbsign ];
+	then
+		echo "sbsign not found, please install the sbsigntool package" >&2
+		ret=1
+	fi
+	if [ ! -f /usr/lib/efitools/x86_64-linux-gnu/KeyTool.efi ];
+	then
+		echo "KeyTool.efi not found, please install the efitools package" >&2
+		ret=1
+	fi
+	if [ ! -f /usr/lib/efitools/x86_64-linux-gnu/HashTool.efi ];
+	then
+		echo "HashTool.efi not found, please install the efitools package" >&2
+		ret=1
+	fi
 	return $ret
 }
 
