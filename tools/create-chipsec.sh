@@ -132,7 +132,7 @@ install_debian () {
   PATH="$PATH:/usr/sbin:/sbin:/bin" chroot "${mount_point}"/ grub-install --target=x86_64-efi --efi-directory /boot --no-nvram
   PATH="$PATH:/usr/sbin:/sbin:/bin" chroot "${mount_point}"/ mkdir -p /boot/EFI/Boot
   PATH="$PATH:/usr/sbin:/sbin:/bin" chroot "${mount_point}"/ cp /boot/EFI/debian/grubx64.efi /boot/EFI/Boot/BOOTX64.EFI
-  PATH="$PATH:/usr/sbin:/sbin:/bin" chroot "${mount_point}"/ grub-mkconfig -o /boot/EFI/grub/grub.cfg
+  PATH="$PATH:/usr/sbin:/sbin:/bin" chroot "${mount_point}"/ grub-mkconfig -o /boot/grub/grub.cfg
 
   PATH="$PATH:/usr/sbin:/sbin:/bin" chroot "${mount_point}"/ passwd -d root
 }
