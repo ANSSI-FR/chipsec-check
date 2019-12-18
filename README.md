@@ -24,8 +24,8 @@ Documentation on what is tested with those tools are detailed in the
 (doc/output) folder:
 
 - [modules_chipsec.pdf](doc/output/modules_chipsec.pdf) explains the expected output from the chipsec tool
-- [CPU Options.pdf](doc/output/CPU Options.pdf) details the security-related CPU options on Intel x86 platform
-- [SPI Protection.pdf](doc/output/SPI Options.pdf) details protection of the SPI flash hosting the BIOS code
-- [SRAM Protection.pdf](doc/output/SRAM Protection.pdf) details register configuration for correct protection of the memory mapping (especially for SMRAM protection against SMM attacks)
+- [CPU Options.pdf](doc/output/CPU%20Options.pdf) details the security-related CPU options on Intel x86 platform
+- [SPI Protection.pdf](doc/output/SPI%20Options.pdf) details protection of the SPI flash hosting the BIOS code
+- [SRAM Protection.pdf](doc/output/SRAM%20Protection.pdf) details register configuration for correct protection of the memory mapping (especially for SMRAM protection against SMM attacks)
 
 The documentation folder also provide guidance on how to build the USB keys.
