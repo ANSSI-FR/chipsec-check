@@ -12,12 +12,12 @@ Les exigences elles-mêmes sont publiées dans un [document séparé]
 (https://www.ssi.gouv.fr/guide/exigences-de-securite-materielles/) ([version
 anglaise](https://www.ssi.gouv.fr/en/guide/hardware-security-requirements-for-x86-platforms/))
 
-Les outils fournis permettent de construire deux clés USB bootable:
+Les outils fournis permettent de construire deux clés USB bootables:
 
 - la première repose sur l'outil [chipsec](https://github.com/chipsec/chipsec)
-  édité par Intel et qui permet l'inspection d'un certain nombre de registre de
+	édité par Intel et qui permet l'inspection d'un certain nombre de registre de
 	configuration.  Chipsec est intégré au sein d'une distribution Linux Debian.
-- la seconde repose sur l'outil keytool.efi qui sert à inspecter et modifier la
-  liste des clés utilisées dans le cadre de _SecureBoot_. Cette clé USB permet
-	de valider que la plateforme peut être configurée avec des clés _SecureBoot_
-	personnalisées.
+- la seconde repose sur l'outil `keytool.efi` (fourni par le paquet `efitools`
+	qui sert à inspecter et modifier la liste des clés utilisées dans le cadre de
+	_SecureBoot_. Cette clé USB permet de valider que la plateforme peut être
+	configurée avec des clés _SecureBoot_ personnalisées.
