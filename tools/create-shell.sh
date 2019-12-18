@@ -1,4 +1,5 @@
 #!/bin/sh
+set -e
 
 check_requirements() {
 	local ret=0
