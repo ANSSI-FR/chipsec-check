@@ -28,6 +28,11 @@ check_requirements() {
 		echo "HashTool.efi not found, please install the efitools package" >&2
 		ret=1
 	fi
+	if [ $(id -u) != 0 ];
+	then
+		echo "Please run as root or through sudo to create partitions on the target USB key" >&2
+		ret=1
+	fi
 	return $ret
 }
 
