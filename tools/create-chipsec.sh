@@ -149,7 +149,7 @@ options   root=PARTUUID=$(get_partuuid ${root})
 EOF
 
   genfstab -U "${mount_point}" >> "${mount_point}"/etc/fstab.tmp
-  cat "${mount_point}"/etc/fstab.tmp | grep -v swap > "${mount_point}"/etc/fstab
+  grep -v swap "${mount_point}"/etc/fstab.tmp > "${mount_point}"/etc/fstab
   rm "${mount_point}"/etc/fstab.tmp
 }
 
