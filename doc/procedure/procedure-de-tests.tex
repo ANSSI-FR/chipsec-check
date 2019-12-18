@@ -1,0 +1,824 @@
+\documentclass{report}
+
+\usepackage[french]{babel}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{hyperref}
+\usepackage{tabularx}
+\usepackage{microtype}
+\usepackage{fullpage}
+
+\title{Procédure de tests \\ SAD Bureautique}
+\author{Agence Nationale de la Sécurité des Systèmes d’Information (ANSSI)}
+\date{2018}
+
+\begin{document}
+\maketitle
+
+\newdimen\longline
+\longline=\textwidth\advance\longline-4cm
+
+\def\LayoutTextField#1#2{#2} % override default in hyperref
+
+\def\lbl#1{\hbox to 4cm{#1\dotfill\strut}}%
+\def\labelline#1#2{\lbl{#1}\vbox{\hbox{\TextField[name=#1,width=#2]{\null}}\kern2pt\hrule}}
+
+\def\q#1{\hbox to \hsize{\labelline{#1}{\longline}}\vskip1.4ex}
+
+\tableofcontents
+
+% =============================================================================
+\part{Objectifs}
+% =============================================================================
+
+Le principal objectif de ce document est de fournir une procédure bien
+documentée afin de vérifier, pour un matériel informatique donné, le respect ou
+non par ledit matériel des exigences de sécurité du SAD Bureautique 2016--2019.
+
+Il est important de rappeler que la vérification de conformité aux exigences de
+sécurité du CCTP ne constitue en rien un audit de sécurité.
+
+% =============================================================================
+\part{Procédures}
+
+\chapter{Exigences matérielles}
+% -----------------------------------------------------------------------------
+
+\section{Exigence 1}
+
+\begin{quote}
+  Pour chaque lot de machines livré et en fonction des options, tous les
+  composants matériels doivent être listés et être identiques.
+  %
+  La liste contiendra les spécifications techniques complètes suivantes~:
+  fabricant, modèle, version, version des logiciels embarqués (y compris
+  \emph{firmware}).
+\end{quote}
+
+\paragraph{Motivation}
+%
+Cette exigence permet à l’autorité qualifiée de connaître précisément quels sont
+les composants matériels utilisés dans les matériels informatiques qu’elle se
+procure.
+%
+Cela comporte au moins deux avantages:
+
+\begin{enumerate}
+\item Lors de l’annonce d’une vulnérabilité critique, il devient théoriquement
+  possible de déterminer quels sont les lots impactés ;
+\item Une évaluation des émissions électromagnétiques d’une machine d’un lot
+  vaut normalement pour le lot complet.
+\end{enumerate}
+
+\paragraph{Procédure}
+Si le candidat ne fournit pas de lui-même la liste demandée, le courriel de
+relance par le vérificateur doit contenir le modèle décrit en
+Annexe~\ref{annexe:modele}.
+%
+Pour s’assurer de l’exactitude de la liste fournie, le vérificateur peut
+utiliser des logiciels comme \texttt{lspci} ou \texttt{lshw}.
+%
+
+\section{Exigence 2}
+
+\begin{quote}
+  Le titulaire fournit les rapports d’évaluation suivant les normes EN 55024 et
+  EN 55022 effectués pour le marquage CE selon la directive européenne DIR
+  2014/30/UE et tous documents prouvant la conformité des machines de série
+  suivant la directive européenne DIR 2014/30/UE annexe II chapitre 4.
+\end{quote}
+
+\paragraph{Motivation}
+%
+En fournissant les documents demandés, le candidat prouve que son matériel
+respecte la réglementation européenne en vigueur.
+
+\paragraph{Procédure}
+%
+Il suffit juste de s’assurer qu’une copie des documents demandés a effectivement
+été fournie par le candidat.
+
+\section{Exigence 3}
+
+\begin{quote}
+  Le titulaire fournit les documentations techniques de l’ensemble des
+  périphériques exécutant un \emph{firmware} et susceptibles de fournir un moyen
+  de communication (filaire ou non filaire).
+  %
+  La nature des connexions que les périphériques activés par défaut initient ou
+  reçoivent doivent être précisée dans la documentation technique.
+  %
+  L’ensemble des options susceptibles de modifier le comportement du poste sur
+  le réseau doivent être listées.
+  %
+  La documentation est fournie en langue française ou, à défaut, en langue
+  anglaise.
+\end{quote}
+
+\paragraph{Motivation}
+%
+Les matériels informatiques contiennent de plus en plus de composants matériels
+autonomes, pouvant notamment initier des communications réseaux avec l’extérieur
+(par exemple, un serveur du candidat) sans que l’autorité qualifiée ne soit
+forcément au courant.
+
+\paragraph{Procédure}
+%
+Le \emph{Management Engine} (ME) est sans doute le composant le plus connu
+présentant un comportement autonome important.
+%
+Il convient de vérifier dans la configuration du BIOS si certains de ses modules
+sont présents et activés par défaut.
+%
+Le vérificateur pourra notamment chercher les noms suivants :
+
+\begin{itemize}
+\item \emph{Active Management Technology} (AMT)
+\item \emph{Computrace}, \emph{Anti-Theft}
+\end{itemize}
+
+L’Annexe~\ref{annexe:modele} comporte une colonne qui permet d’indiquer au
+candidat si un composant matériel présente un tel comportement.
+
+\section{Exigence 4}
+
+\begin{quote}
+  Le titulaire doit être en mesure de fournir la liste complète des documents de
+  spécification technique et des guides de programmation des composants
+  matériels qui sont initialisés ou manipulés par le \emph{firmware}.
+  %
+  La liste distingue les informations disponibles publiquement de celles
+  soumises à un accord de confidentialité.
+  %
+  Si les accords de confidentialité interdisent la transmission de ces
+  informations, le nombre de périphériques concernés doit être indiqué.
+  %
+  La liste précise également les composants dont les descriptions techniques
+  sont indisponibles ou partielles.
+  %
+  La langue du document es précisée pour chacun.
+\end{quote}
+
+\paragraph{Motivation}
+%
+L’intérêt de cette exigence est de permettre à l’autorité qualifiée de savoir
+précisément composants matériels sont utilisés par le BIOS et, potentiellement,
+comment elle peut elle-même en tirer parti (grâce aux documents de spécification
+technique).
+
+\paragraph{Procédure}
+%
+Vérifier grâce à des outils standards (\texttt{lspci}, \texttt{lshw}, etc.)  si
+les composants matériels reportés concordent avec la liste fournie par le
+candidat.
+
+\section{Exigence 5}
+
+\begin{quote}
+  Si une interface matérielle n’est pas listée dans la configuration demandée,
+  elle doit être soit physiquement absente de la configuration livrée, soit
+  présente et désactivée par défaut.
+  %
+  Sa présence doit être documentée explicitement et elle ne peut être activée
+  que par l’autorité qualifiée (pas par l’utilisateur) de façon sécurisée.
+  %
+  La désactivation de cette interface ne doit pas être plus complexe que son
+  activation; les prérequis nécessaires à l’activation doivent être suffisants
+  pour la désactivation. Si les modules sont présents et désactivés, ils ne
+  doivent ni initier ni accepter des connexions réseau.
+\end{quote}
+
+\paragraph{Motivation}
+%
+Afin de ne pas augmenter inutilement la surface d’attaque potentiellement
+exploitable par un attaquant, désactiver les interfaces de communication non
+nécessaires (3G, \emph{Blutooth}) est une bonne pratique.
+%
+Le CCTP décrit précisément les configurations matérielles attendues.
+%
+Quand un candidat propose un matériel qui dispose d’options supplémentaires par
+rapport à ces configurations, il est important que ces dernières soient
+désactivées par défaut.
+
+\paragraph{Procédure}
+%
+Une revue détaillée des options de configuration de BIOS est importante pour
+s’assurer de l'état des interfaces de configuration supplémentaires.
+%
+Il peut aussi être intéressant de s’assurer, grâce à des outils standards comme
+\texttt{lshw} ou \texttt{lspci}, du respect par le BIOS de cette configuration.
+
+\section{Exigence 6}
+
+\begin{quote}
+  Les interfaces de communication sans fil devront être soit absente, soit
+  démontables physiquement (par l’autorité qualifiée) sans perturber le bon
+  fonctionnement de la machine et sans influence sur la garantie.
+\end{quote}
+
+\paragraph{Motivation}
+%
+Cette exigence suit la même philosophie que la précédente : limiter au besoin la
+surface d’attaque à disposition pour l’attaquant.
+
+\paragraph{Procédure}
+%
+Le vérificateur peut essayer de démonter lui-même les interfaces de
+communication concernées.
+
+\section{Exigence 7}
+
+\begin{quote}
+  La plate-forme dispose d’un système de virtualisation des entrées sorties
+  (I/OMMU), activable dans l’interface de configuration du firmware.
+\end{quote}
+
+\paragraph{Motivation}
+%
+La virtualisation des entrées sorties est une technologie relativement mature
+qui peut permettre, de manière transparente pour l’utilisateur final, de limiter
+l’impact de la compromission d’un périphérique matériel.
+
+\paragraph{Procédure}
+%
+L’I/OMMU d’Intel s’appelle \emph{Intel VT-d}. Celle d’AMD s’appelle
+\emph{AMD-Vi}.
+%
+Une revue des options de configuration du BIOS permet de s’assure de sa
+présence.
+%
+En cas de doute, il est possible de s’assure de son activation en amorçant le
+matériel sur un système Linux quelconque et de lancer la commande :
+\texttt{dmesg | grep -i dmar}.
+%
+Il faut s’assurer le cas échéant que le noyau Linux possède le support adéquat,
+ce qui est le cas avec celui présent sur la clef USB \texttt{ChipSec}.
+
+\section{Exigence 8}
+
+\begin{quote}
+  Si un TPM est présent, il doit être certifié (au sens des critères communs) au
+  niveau EAL4+ suivant l’un des deux profils de protection suivant :
+  \begin{itemize}
+  \item Trusted Platform Module TPM Family 1.2 1 TCG Protection Profile PC
+    Client ;
+  \item Specific TPM family 2.0.
+  \end{itemize}
+\end{quote}
+
+\paragraph{Motivation}
+%
+Le \emph{Trusted Platform Module} est un composant matériel pouvant intervenir
+dans la sécurisation de la séquence d’amorçage du matériel.
+%
+Les TPM évalués au niveau EAL4+ ont été regardé par un laboratoire indépendant
+dans le cadre d’une évaluation de sécurité de type Critères Communs.
+
+\paragraph{Procédure}
+%
+Le vérificateur doit vérifier la bonne fourniture du certificat Critères Communs
+par le candidat.
+
+\section{Exigence 9}
+
+\begin{quote}
+  Le démarrage de la plate-forme doit pouvoir être protégé par un mot de passe à
+  l’initiative de l’autorité qualifiée.
+\end{quote}
+
+\paragraph{Motivation}
+%
+L’utilisation d’un mot de passe pour protéger le démarrage de la machine reste à
+ce jour l’un des moyens les plus simples de s’assurer qu’un attaquant ne peut
+pas utiliser le matériel une fois éteint.
+
+\paragraph{Procédure}
+%
+Le vérificateur doit vérifier que le menu de configuration du BIOS offre bien la
+possibilité de protéger la séquence de démarrage du matériel par un mot de
+passe.
+%
+Il est aussi possible d’essayer de configurer un mot de passe et de vérifier
+qu’il est bien demandé au prochain redémarrage du matériel.
+
+\section{Exigence 10}
+
+\begin{quote}
+  L’ordre de sélection des périphériques susceptibles d’amorcer le système doit
+  être modifiable à l’initiative de l’autorité qualifiée.
+\end{quote}
+
+\paragraph{Motivation}
+%
+Configurer le matériel pour que le disque dur soit toujours sélectionné en
+premier par le BIOS est une bonne pratique de sécurité.
+
+\paragraph{Procédure}
+%
+Le vérificateur doit vérifier que le menu de configuration du BIOS offre bien la
+possibilité de protéger la séquence de démarrage du matériel par un mot de
+passe.
+
+\section{Exigence 11}
+
+\begin{quote}
+  L’accès en modification aux paramètres du firmware (activation ou
+  désactivation de fonctions, ordre de démarrage des périphériques etc.) doit
+  pouvoir être protégé par un mot de passe à l’initiative de l’autorité
+  qualifiée.
+\end{quote}
+
+\paragraph{Motivation}
+%
+L’utilisation d’un mot de passe pour protéger l’accès au menu de configuration
+du BIOS est essentielle pour s’assurer qu’un attaquant n’est pas en mesure de
+simplement changer cette configuration pour, par exemple, désactiver certains
+mécanismes de sécurité du \emph{firmware}.
+
+\paragraph{Procédure}
+%
+La vérification se fait dans le menu de configuration du BIOS.
+
+\section{Exigence 12}
+
+\begin{quote}
+  Les mécanismes de sécurité du firmware sont à l’état de l’art au moment de la
+  livraison.
+  %
+  En particulier, celui-ci doit respecter la norme ISO 19678 Information
+  Technology - BIOS protection guidelines.
+\end{quote}
+
+\paragraph{Motivation}
+%
+La sécurité des \emph{firmwares} a fait l’objet d’une attention accrue ces
+dernières années.
+%
+De nombreuses failles de sécurité ont été révélées.
+%
+Les processeurs les plus récents intègrent les contre-mesures adéquates, mais il
+est important de vérifier que le \emph{firmware} les utilise correctement.
+
+\paragraph{Procédure}
+%
+L’utilisation de l’outil Chipsec doit permettre de relever les problèmes
+potentiels les plus évidents ; ces derniers demanderont une vérification plus
+avant, pour s’assurer que la faiblesse révélée n’est pas contrebalancée par
+d’autres contre mesures.
+%
+L’ANSSI fournit une image d’un système Linux minimal pouvant être copié sur une
+clef USB.
+%
+Le système comporte l’outil Chipsec.
+
+\section{Exigence 13 \& 14}
+
+\begin{quote}
+  Le titulaire s’engage à intégrer ce correctif dans les nouvelles machines
+  livrées sous les mêmes délais.
+\end{quote}
+
+\paragraph{Motivation}
+%
+Le principal intérêt de ces exigences est de créer une clause de \og{}garantie
+pour la sécurité\fg{}, qui permet à l’autorité qualifiée de s’assurer la
+disponibilité de mises à jour de sécurité venant corriger les vulnérabilités les
+plus critiques.
+
+\paragraph{Procédure}
+%
+Ces exigences sont contractuelles : en postulant, le candidat s’engage à s’y
+conformer.
+
+\section{Exigence 15 \& 16}
+
+\begin{quote}
+  Les modules de firmware susceptibles de modifier le comportement du système
+  d’exploitation ou l’intégrité des données (par exemple, les services résidents
+  de protection contre le vol) sont soit absents du firmware, soit présents et
+  désactivés par défaut.
+  %
+  Ces modules ne peuvent être activés que par l’autorité qualifiée (pas par
+  l’utilisateur) de façon sécurisée.
+  %
+  La désactivation de ces modules ne doit pas être plus complexe que leur
+  activation; les prérequis nécessaires à l’activation doivent être suffisants
+  pour la désactivation.
+  %
+  Si les modules sont présents et désactivés, ils ne doivent ni initier ni
+  accepter des connexions réseau.
+\end{quote}
+
+\begin{quote}
+  Les dispositifs de contrôle à distance susceptibles de modifier le firmware ou
+  ses données (par exemples celles utilisant \emph{AMD PSP} ou Intel
+  \emph{Management Engine}, comme Intel \emph{Active Management Technology}
+  (AMT), qui échappent au contrôle du système d’exploitation, sont soit absents
+  du firmware, soit présents et désactivés par défaut.
+  %
+  Ces modules ne peuvent être activés que par l’autorité qualifiée (pas par
+  l’utilisateur) de façon sécurisée.
+  %
+  La désactivation de ces modules ne doit pas être plus complexe que leur
+  activation; les prérequis nécessaires à l’activation doivent être suffisants
+  pour la désactivation.
+  %
+  Si les modules sont présents et désactivés, ils ne doivent ni initier ni
+  accepter des connexions réseau.
+\end{quote}
+
+\paragraph{Motivation}
+%
+Sans doute dans un but de différentiation par rapport à leurs concurrents, les
+constructeurs ont eu tendance ces dernières années à développer des solutions de
+management à distance.
+%
+Ces dernières posent un important risque pour la sécurité de la plate-forme.
+%
+Il est donc préférable qu’elles soient \textbf{(1)} connues de l’autorité
+qualifiées et \textbf{(2)} désactivées par défaut.
+
+\paragraph{Procédure}
+%
+Le vérificateur peut d’abord aller regarder dans les menus de configuration du
+BIOS si de tels modules (type typiquement, les modules du \emph{Management
+  Engine} d’Intel) y apparaissent et sont/peuvent être désactivés.
+%
+La plupart de ces services ayant accès à l’interface réseau, il serait sans
+doute intéressant de brancher le matériel testé sur un réseau contrôlé et de
+capturer son trafic sortant.
+
+\section{Exigence 17}
+
+\begin{quote}
+  Les mécanismes de protection contre l’inspection de code sont soit absents du
+  firmware, soit présents et désactivés par défaut.
+  %
+  Ces modules ne peuvent être activés que par l’autorité qualifiée (pas par
+  l’utilisateur) de façon sécurisée.
+  %
+  La désactivation de ces modules ne doit pas être plus complexe que leur
+  activation; les prérequis nécessaires à l’activation doivent être suffisants
+  pour la désactivation.
+\end{quote}
+
+\paragraph{Motivation}
+%
+Dans une logique de maîtrise du matériel qu’elle utilise, l’autorité devrait
+avoir la possibilité d’inspecter le \emph{firmware} installé sur ce dernier.
+
+\paragraph{Procédure}
+%
+Un relevé de configuration de la Flash SPI (par exemple grâce à Chipsec) permet
+de savoir si le contenu est bien protégé en écriture, mais aussi de savoir s’il
+est accessible en lecture.
+
+\section{Exigence 18}
+
+\begin{quote}
+  L’outil de configuration du firmware UEFI doit proposer un moyen de
+  remplacement des clés SecureBoot du titulaire et des tierces-parties par des
+  clés fournies par l’autorité qualifiée (pas par l’utilisateur).
+\end{quote}
+
+\paragraph{Motivation}
+%
+Le \emph{Secure Boot} est un mécanisme de sécurité logicielle très appréciable
+pour la sécurisation de la séquence de démarrage d’un matériel.
+%
+Cependant, il peut être détourné de son utilité première à des fins de
+verrouillage de la machine.
+%
+Cette exigence sert à prévenir ce scénario.
+
+\paragraph{Procédure}
+%
+La vérification se fait manuellement en allant vérifier dans les menus de
+configuration du BIOS.
+%
+L’ANSSI fournit le matériel cryptographique et les utilitaires nécessaires pour
+tester le remplacement des clefs SecureBoot d’une machine, sous la forme d’une
+image pouvant être copiée sur une clef USB.
+
+\section{Exigence 19}
+
+\begin{quote}
+  Si un TPM est présent dans la configuration, il ne peut être activé que par
+  l’autorité qualifiée (pas par l’utilisateur) de façon sécurisée.
+  %
+  La désactivation de celui-ci ne doit pas être plus complexe que son
+  activation; les prérequis nécessaires à l’activation doivent être suffisants
+  pour la désactivation.
+\end{quote}
+
+\paragraph{Motivation}
+%
+L’autorité qualifié doit avoir la maîtrise du matériel qu’elle se procure.
+
+\paragraph{Procédure}
+%
+La vérification se fait manuellement en allant vérifier dans les menus de
+configuration du BIOS.
+
+\section{Exigence 20}
+
+\begin{quote}
+  La plate-forme dispose d’une protection contre la modification malveillante du
+  firmware (par exemple, un verrou d’accès en lecture seule) ou d’un mécanisme
+  de détection des modifications (par exemple, une vérification de signature),
+  accompagnés d’une fonction de notification fiable à l’autorité qualifiée ou à
+  l’utilisateur de la plate-forme.
+  %
+  On inclut dans les modifications malveillante le fait d’installer une version
+  inférieure du firmware, par exemple pour réinstaller une version correctement
+  signée mais vulnérable.
+\end{quote}
+
+\paragraph{Motivation}
+%
+Il est important de ne pas laisser à l’attaquant la possibilité de forcer
+l’installation d’un \emph{firmware} arbitraire ou plus ancien que la version
+courante.
+
+\paragraph{Procédure}
+%
+La vérification se fait manuellement en allant vérifier dans les menus de
+configuration du BIOS.
+%
+En plus de la bonne configuration de la flash SPI (\textsc{ChipSec}), la
+vérification devrait aussi comprendre la tentative d’installation d’une ancienne
+version du BIOS de la machine sélectionnée (la plupart des constructeurs ont un
+site Internet public depuis lequel il est possible de télécharger différentes
+version du firmware d’une machine).
+%
+La tentative d’installation d’une version de firmware dont la signature a été
+altérée est sans doute nécessaire dans un souci d’exhaustivité.
+
+\section{Exigence 21}
+
+\begin{quote}
+  Les composants présents sur la plate-forme (interfaces de communications,
+  ports d’entrée sortie, périphériques internes) doivent pouvoir être désactivés
+  dans l’interface de configuration du firmware par l’autorité qualifiée (pas
+  par l’utilisateur) de façon sécurisée.
+  %
+  La désactivation de ces modules ne doit pas être plus complexe que leur
+  activation; Les prérequis nécessaires à l’activation doivent être suffisants
+  pour la désactivation.
+  %
+  Si les modules sont désactivés, ils ne doivent ni initier ni accepter des
+  communications ou connexions réseau.
+\end{quote}
+
+\paragraph{Motivation}
+%
+Cette exigence s’inscrit dans la même logique que les exigences précédentes
+demandant la possibilité de désactiver depuis l’interface du BIOS des composants
+matériels: limiter la surface d’attaque et s’assurer la maîtrise du matériel
+obtenu.
+
+\paragraph{Procédure}
+%
+La vérification se fait manuellement en allant vérifier dans les menus de
+configuration du BIOS.
+
+
+\chapter{Exigences logicielles}
+% -----------------------------------------------------------------------------
+
+\section{Exigence 22}
+
+\begin{quote}
+  Les plateformes n’imposent pas le support d’un système d’exploitation
+  particulier, ni d’une version précise de celui-ci.
+\end{quote}
+
+\paragraph{Motivation}
+%
+Il est dans l’intérêt de l’autorité qualifiée de conserver \emph{in fine} le
+choix final du système d’exploitation qu’elle utilise sur les matériels qu’elle
+se procure.
+
+\paragraph{Procédure}
+%
+La vérification de certaines exigences du CCTP demandant de démarrer sur une
+clef USB possédant un système GNU/Linux, son bon démarrage est une vérification
+suffisante dans le cadre des tests de conformité.
+
+
+% =============================================================================
+
+\appendix
+
+% =============================================================================
+\part{Annexes}
+
+\chapter{Modèle de liste des composants} \label{annexe:modele}
+% -----------------------------------------------------------------------------
+
+\chapter{Formulaire}
+% -----------------------------------------------------------------------------
+
+\begin{Form}
+  \q{Vérificateur}
+  \q{Candidat}
+  \q{Référence Matériel}
+\end{Form}
+
+\section{Exigences \og{}documentaires\fg{}}
+
+Pour satisfaire aux exigences documentaires, le candidat doit fournir, sous
+forme de listes, les composants matériels de sa plate-forme; pour l’aider dans
+sa démarche, il est conseillé de lui fournir le document décrit dans
+l’Annexe~\ref{annexe:modele}.
+
+En plus de cette liste, il convient de vérifier que sont bien fournis:
+
+\begin{Form}
+  \begin{tabularx}{\textwidth}{Xcc}
+    & Oui & Non \\
+    Le certificat Critères Communs du TPM
+       & \CheckBox[width=1em]{}
+       & \CheckBox[width=1em]{} \\
+    Les rapports d’évaluation suivant les nomes EN 55024 et EN 55022
+       & \CheckBox[width=1em]{}
+       & \CheckBox[width=1em]{}
+  \end{tabularx}
+\end{Form}
+
+\section{Exigences \og{}configuration\fg{}}
+
+La vérification de ces exigences est rapide dans la plupart des cas, mais peut
+être compliquée si le menu de configuration du BIOS n’est pas accessible
+facilement\,\footnote{Par exemple, certains ordinateurs HP ne font pas la
+  publicité de la séquence de touches nécessaires pour entrer dans le menu de
+  configuration du BIOS.} ou si sa présentation n’est pas habituelle.
+%
+Dans ces cas là, il ne faut pas hésiter à solliciter le candidat directement.
+
+\begin{Form}
+  \begin{tabularx}{\textwidth}{Xcc}
+    & Oui & Non \\
+    Présence d’une IO/MMU (VT-d, AMD-Vi) activée par défaut
+      & \CheckBox[width=1em]{}
+      & \CheckBox[width=1em]{} \\
+    Choix d’un mot de passe de démarrage
+      & \CheckBox[width=1em]{}
+      & \CheckBox[width=1em]{} \\
+    Choix d’un mot de passe pour le menu de configuration BIOS
+      & \CheckBox[width=1em]{}
+      & \CheckBox[width=1em]{} \\
+    Choix de l’ordre de sélection des périphériques au démarrage
+      & \CheckBox[width=1em]{}
+      & \CheckBox[width=1em]{} \\
+    Modules de gestion à distance (\emph{AMT}, \emph{Computrace},
+    \emph{Anti-Theft}) désactivés par défaut
+      & \CheckBox[width=1em]{}
+      & \CheckBox[width=1em]{} \\
+    Possibilité de désactiver les interfaces de communication
+      & \CheckBox[width=1em]{}
+      & \CheckBox[width=1em]{} \\
+    Possibilité de désactiver les ports d’entrée/sortie (par exemple USB)
+      & \CheckBox[width=1em]{}
+      & \CheckBox[width=1em]{} \\
+  \end{tabularx}
+\end{Form}
+
+\section{Exigences \og{}interfaces\fg{}}
+
+Dans une visée de réduction de la surface d’attaque potentielle, les matériels
+informatiques livré dans le cadre du marché doivent satisfaire aux exigences
+suivantes :
+
+\begin{Form}
+  \begin{tabularx}{\textwidth}{Xcc}
+    & Oui
+    & Non \\
+    L’interface WiFi est démontable sans perturber le bon fonctionnement de la
+    machine
+    & \CheckBox[width=1em]{}
+    & \CheckBox[width=1em]{} \\
+    Les interfaces qui ne sont pas listées dans la description de la
+    configuration matérielle (\emph{Bluetooth}, 3G et 4G, etc.) sont désactivées
+    par défaut
+    & \CheckBox[width=1em]{}
+    & \CheckBox[width=1em]{} \\
+  \end{tabularx}
+\end{Form}
+
+
+\section{Exigences \og{}durcissement\fg{}}
+
+La vérification des exigences concernant le durcissement du BIOS permet de
+vérifier que le candidat ne fait pas d’erreurs trop importantes.
+%
+Malheureusement, la diversité des solutions propriétaires utilisées par les
+constructeurs rend difficile la proposition d’une procédure précise poussée.
+%
+Pour cette raison, l’ANSSI a pris le parti d’utiliser
+\textsc{ChipSec}\,\footnote{\url{https://github.com/chipsec/chipsec}}, un outil
+\emph{open source} proposé par Intel.
+
+\begin{enumerate}
+\item Amorcer le matériel sur la clef USB \texttt{ChipSec} fournit par l’ANSSI
+\item Se connecter avec l’utilisateur \texttt{root}
+\item Lancer \textsc{ChipSec} en tapant dans l’invite de commande
+  \texttt{chipsec\_main}
+\end{enumerate}
+
+\begin{Form}
+  \begin{tabularx}{\textwidth}{Xcc}
+    & Oui & Non \\
+    La commande \texttt{chipsec\_main}, une fois terminée, n’annonce aucun échec
+      & \CheckBox[width=1em]{}
+      & \CheckBox[width=1em]{} \\
+  \end{tabularx}
+  \q{Si \og{}Non\fg{} lesquels :}
+  \begin{tabularx}{\textwidth}{Xcc}
+    La commande \texttt{chipsec\_util spi dump img.bin} termine sans erreur
+      & \CheckBox[width=1em]{}
+      & \CheckBox[width=1em]{} \\
+  \end{tabularx}
+\end{Form}
+
+L’utilisation de {\sc ChipSec} n’est possible qu’avec certains matériels
+Intel.
+%
+Il est donc possible que l’outil ne fonctionne pas correctement avec certains
+processeurs Intel peu communs ou avec du matériel basé sur AMD.
+%
+En premier recours, il est possible de forcer le lancement de {\sc ChipSec} avec
+la command \texttt{chipsec\_main -i}.
+%
+En second recours, l’ANSSI se tient à la disposition des vérificateurs.
+
+\section{Exigences \og{}\emph{Secure Boot}\fg{}}
+
+Le constructeur doit laisser la possibilité à l’autorité qualifiée de changer
+les clefs \emph{Secure Boot} utilisées par le BIOS pour vérifier les signatures
+des composants logiciels utilisés lors de la séquence de démarrage du matériel.
+%
+Sans cette possibilité, il n’est potentiellement pas possible d’avoir la
+maîtrise du système d’exploitation s’exécutant sur le matériel.
+%
+Le \emph{Setup Mode} est un état particulier du BIOS qui permet de changer les
+clefs utilisées par le \emph{Secure Boot}.
+%
+Certains BIOS ne fournissent pas ce mode, et préfèrent proposer des interfaces
+de configuration directement dans la configuration du BIOS.
+%
+Le cas échéant, il ne faut pas hésiter à demander des précisions au candidat.
+
+\begin{enumerate}
+\item Entrer dans le menu de configuration du BIOS
+  \begin{enumerate}
+  \item Trouver la section relative au \emph{Secure Boot} (souvent dans un
+    onglet \emph{Security})
+  \item Désactiver le \emph{Secure Boot}
+  \item Activer le \emph{Setup Mode} (par exemple, Lenovo possède une option
+    \emph{Reset to Setup Mode})
+  \end{enumerate}
+\item Redémarrer et amorcer la séquence de démarrage de matériel sur la clef USB
+  \texttt{SecBoot} fournie par l’ANSSI
+  \begin{enumerate}
+  \item Lorsque l’invite de commande du \emph{Shell EFI} apparaît, taper
+    \texttt{fs0:}, puis \texttt{dir}
+  \item Si l’utilitaire \texttt{KeyTool.efi} apparaît dans la liste, continuer,
+    sinon revenir à l’étape précédente en incrémentant l’entier après
+    \texttt{fs}
+  \item Lancer \texttt{KeyTool.efi}
+  \item Sélectionner \emph{Edit Keys}
+  \item Sélectionner \emph{Allowed Signature Database (db)}
+  \item Sélectionner le premier disque proposé, chercher \texttt{db.esl}; s'il
+    est présent dans la liste, le sélectionner, sinon appuyer sur
+    \texttt{Echap.} et sélectionner le disque suivant, jusqu’à le trouver
+  \item Sélectionner \emph{The Key Exchange Key (KEK)}
+  \item Sélectionner le bon disque, puis \texttt{KEK.esl}
+  \item Sélectionner \emph{The Platform Key (PK)}
+  \item Sélectionner le bon disque, puis \texttt{PK.auth}
+  \item Quitter l’application \texttt{KeyTool.efi}
+  \end{enumerate}
+\end{enumerate}
+
+Pour vérifier le bon déroulé des étapes précédentes, il est possible d’essayer
+d’exécuter des applications UEFI depuis le \emph{Shell EFI}.
+
+\begin{Form}
+  \begin{tabularx}{\textwidth}{Xcc}
+    & Oui & Non \\
+    L’application \texttt{KeyTool.efi} refuse de démarrer
+      & \CheckBox[width=1em]{}
+      & \CheckBox[width=1em]{} \\
+    L’application \texttt{HelloWorld.efi} fonctionne correctement
+      & \CheckBox[width=1em]{}
+      & \CheckBox[width=1em]{} \\
+  \end{tabularx}
+\end{Form}
+
+\textbf{Attention :} Si le vérificateur essaie de lancer l’outil
+\textsc{ChipSec} après avoir configuré \emph{Secure Boot}, il est possible que
+l’un de ses tests échoue.
+
+% =============================================================================
+
+\end{document}
