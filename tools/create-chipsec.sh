@@ -1,4 +1,5 @@
 #!/bin/bash
+set -e
 
 # Return this error code if the target is not present inside the file system
 ENOTAFILE=1
