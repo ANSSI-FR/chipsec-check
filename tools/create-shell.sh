@@ -1,5 +1,15 @@
 #!/bin/sh
 
+check_requirements() {
+	local ret=0
+	[ -x /sbin/parted ] || echo "parted not found, please install the parted package" >&2 && ret=1
+	[ -x /sbin.mkfs.vfat ] || echo "mkfs.vfat not found, please install the dosfstools package" >&2 && ret=1
+	[ -x /usr/bin/sbsign ] || echo "sbsign not found, please install the sbsigntool package" >&2 && ret=1
+	[ -f /usr/lib/efitools/x86_64-linux-gnu/KeyTool.efi ] || echo "KeyTool.efi not found, please install the efitools package" >&2 && ret=1
+	[ -f /usr/lib/efitools/x86_64-linux-gnu/HashTool.efi ] || echo "HashTool.efi not found, please install the efitools package" >&2 && ret=1
+	return $ret
+}
+
 part_disk () {
     disk="${1}"
 
@@ -50,6 +60,7 @@ install_key_tool () {
 }
 
 main () {
+		check_requirements || exit 1
     target="${1}"
     mount_point=$(mktemp -d -p "" efishellXXX)
     part_disk "${target}"
