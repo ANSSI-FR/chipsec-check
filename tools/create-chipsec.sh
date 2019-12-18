@@ -131,27 +131,6 @@ install_debian () {
   PATH="$PATH:/usr/sbin:/sbin:/bin" chroot "${mount_point}"/ passwd -d root
 }
 
-install_linux () {
-  root="${1}"
-
-  pacstrap "${mount_point}" bash coreutils systemd-sysvcompat kmod python2 udev filesystem linux-lts linux-lts-headers git gcc make sed nasm python2-setuptools
-  arch-chroot "${mount_point}" bootctl --path /boot --no-variable install
-  cat > "${mount_point}"/boot/loader/entries/mini.conf << EOF
-title     Chipsec
-linux     /vmlinuz-linux-lts
-initrd    /initramfs-linux-lts.img
-options   root=PARTUUID=$(get_partuuid ${root})
-EOF
-
-  genfstab -U "${mount_point}" >> "${mount_point}"/etc/fstab.tmp
-  grep -v swap "${mount_point}"/etc/fstab.tmp > "${mount_point}"/etc/fstab
-  rm "${mount_point}"/etc/fstab.tmp
-}
-
-unmount_linux () {
-  umount "${mount_point}"/boot "${mount_point}"
-}
-
 umount_debian () {
   umount "${mount_point}"/dev/
   umount "${mount_point}"/proc/
