@@ -115,7 +115,7 @@ install_debian () {
   mount sysfs "${mount_point}"/sys -t sysfs
   mount -o bind /dev "${mount_point}"/dev
 
-  PATH="$PATH:/usr/sbin:/sbin:/bin" chroot "${mount_point}"/ apt install git systemd build-essential gcc make sed nasm python-setuptools linux-image-amd64 linux-headers-amd64 python python-dev grub-efi
+  PATH="$PATH:/usr/sbin:/sbin:/bin" chroot "${mount_point}"/ apt -y install git systemd build-essential gcc make sed nasm python-setuptools linux-image-amd64 linux-headers-amd64 python python-dev grub-efi
 
   echo chipsec > ${mount_point}/etc/hostname
   
