@@ -1,32 +1,26 @@
 #!/bin/bash
 set -e
 
-# Return this error code if the target is not present inside the file system
-ENOTAFILE=1
 
 usage () {
   cat <<EOF
 NAME
-        ${0} - create a minimal linux system with ChipSec
+	${0} - create a minimal linux system with ChipSec
 
 SYNOPSIS
-        ${0} DISK
+	${0} DISK
 
 DESCRIPTION
-        Create a minimal linux system (with Chipsec installed) on DISK. It wipes
-        out the content of DISK by doing so, so be careful when using this tool.
-
-ERRORS
-        ENOTAFILE (1)
-            DISK should be a file available inside a mounted filesystem, but it
-            looks like it is not.
+	Create a minimal linux system (with Chipsec installed) on DISK. DISK
+	can be a block device or a file which can then be copied to a disk.
+	The content of DISK is wiped by doing so, so be careful when using this tool.
 EOF
 }
 
 install_chipsec () {
   PATH="$PATH:/usr/sbin:/sbin:/bin" chroot "${mount_point}" git clone https://github.com/chipsec/chipsec /root/chipsec
 
-  mkdir "${mount_point}"/root
+  mkdir -p "${mount_point}"/root
   cp build-chipsec.sh "${mount_point}"/root/
   PATH="$PATH:/usr/sbin:/sbin:/bin"  chroot "${mount_point}" /root/build-chipsec.sh
 
@@ -166,14 +160,31 @@ umount_debian () {
   umount "${mount_point}"
 }
 
+cleanup() {
+	set +e
+	echo "Error in processus, cleaning up" >&2
+	umount_debian
+	losetup -d ${disk} 2>/dev/null
+}
+
 main () {
-  disk="${1}"
+	arg="${1}"
+	if [ -z "${arg}" ];
+	then
+		usage
+		exit 1
+	fi
+	trap cleanup EXIT
+	if [ -b "${arg}" ]; #block device, just use it directly
+	then
+		disk=${arg}
+		sep=""
+	else
+		truncate -s 2G ${arg}
+		disk=$(losetup --find --show "$arg")
+		sep="p"
+	fi
   mount_point=$(mktemp -d -p "" efiliveXXX)
-  #if [[ ! -f "${disk}" ]]
-  #then
-  #  echo "${1} is not a file"
-  #  exit ${ENOTAEFILE}
-  #fi
 
   printf "Use ${disk}? (Y/n) "
   exit_if_no "$(ask_confirm "Y")"
@@ -182,8 +193,8 @@ main () {
 
   #boot="$(ls ${disk}* | egrep 1$)"
   #root=$(ls ${disk}* | egrep 2$)
-  boot="${disk}"1
-  root="${disk}"2
+  boot="${disk}${sep}1"
+  root="${disk}${sep}2"
   sleep 1
   echo $root
   echo "${root} as root partition"
