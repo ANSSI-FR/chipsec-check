@@ -44,17 +44,6 @@ part_disk () {
     parted "${1}" --script set 1 boot on
 }
 
-format_key () {
-    part="${1}"1
-    sleep 1
-    mkfs.vfat "${part}"
-}
-
-mount_key () {
-    part="${1}"1
-    mount "${part}" "${mount_point}"
-}
-
 umount_key () {
     umount "${mount_point}"
 }
@@ -87,17 +76,35 @@ install_key_tool () {
 
 main () {
 		check_requirements || exit 1
-    target="${1}"
+    arg="${1}"
+		if [ -b "${arg}" ]; #block device, just use it directly
+		then
+			target=${arg}
+			sep=""
+		else
+			if [ ! -f "${arg}" ]; # not a regular file, create it manually
+			then
+				truncate -s 4M ${arg}
+			fi
+			target=$(losetup --find --show "$arg")
+			sep="p"
+		fi
+
     mount_point=$(mktemp -d -p "" efishellXXX)
     part_disk "${target}"
-    format_key "${target}"
+		sleep 1
+    mkfs.vfat "${target}${sep}1"
 
-    mount_key "${target}"
+    mount "${target}${sep}1" ${mount_point}
     install_ca
     install_shell
     install_key_tool
     umount_key
     rmdir "${mount_point}"
+		if [ ! -b "$arg" ];
+		then
+			losetup -d $target
+		fi
 }
 
 main "${1}"
