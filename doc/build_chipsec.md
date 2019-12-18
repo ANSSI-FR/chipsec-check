@@ -1,8 +1,7 @@
-# USB KEY BUILDING FOR CHIPSEC AND SECUREBOOT CHECKS  v0.1 (04/2019)
+# USB key building for chipsec and secureboot checks
 ```
 A Help to build your own ChipSec and SecureBoot USB keys
 ```
-
 
 ## Final USB keys
    - **USB KEY 1** : live Debian distribution to launch **ChipSec** from the computer to analyze
@@ -15,30 +14,33 @@ A Help to build your own ChipSec and SecureBoot USB keys
 	sudo apt-get install efitools
 ~~~
 
-## Tool to build the usb keys : create-keys.sh
+## Tool to build the USB keys : create-keys.sh
 
 > **Note:**
 Some sub scripts require access to sudo commands.
 >
 
+Both build scripts support writing to a block device (`/dev/sdc` for example)
+or a standard file, which can be later copied to a USB drive using `dd`.
+
 ### Build USB KEY 1
-Plug a new usb key (attached on /dev/sdc in this case).
+Plug a new USB key (attached on /dev/sdc in this case).
 
 ~~~
 ./create-keys.sh live /dev/sdc
 ~~~
 
-Unplug the usb key.
+Unplug the USB key.
 
 
 ### Build USB KEY 2
-Plug a new usb key (attached on /dev/sdc in this case).
+Plug a new USB key (attached on /dev/sdc in this case).
 
 ~~~
 ./create-keys.sh shell /dev/sdc
 ~~~
 
-Unplug the usb key.
+Unplug the USB key.
 
 ## Boot on keys
 
@@ -49,6 +51,8 @@ Plug one of keys, start the computer.
 1. boot on the USB key, then at the bootloader prompt start linux live
 1. when finished booting, login as root (no password)
 1. from the root terminal, launch ChipSec with "chipsec_main.py".
+1. alternately you can run the dump_system.sh script which will also gather
+information about the machine (hardware present, firmware versions et.c)
 
 ### USB KEY 2 :
 
