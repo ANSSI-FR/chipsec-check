@@ -23,8 +23,8 @@ Les outils fournis permettent de construire deux clés USB bootables:
 	configurée avec des clés _SecureBoot_ personnalisées.
 
 Des versions pré-construites des clés USB sont disponible sous forme d'ISO dans
-la section [releases](releases). Les executable EFI sont signés avec une clé
-généré par le développeur et ne devraien être utilisées qu'à des fins
-d'évaluation. Les utilisateurs sont fortement invités à générer leur propre
-autorité de certification et clés afin d'utiliser celles ci pour des tests
-réels.
+la section [releases](https://github.com/ANSSI-FR/chipsec-check/releases). Les
+executable EFI sont signés avec une clé généré par le développeur et ne
+devraien être utilisées qu'à des fins d'évaluation. Les utilisateurs sont
+fortement invités à générer leur propre autorité de certification et clés afin
+d'utiliser celles ci pour des tests réels.
