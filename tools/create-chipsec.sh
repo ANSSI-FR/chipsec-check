@@ -159,7 +159,7 @@ main () {
 		disk=${arg}
 		sep=""
 	else
-		truncate -s 2G ${arg}
+		truncate -s 2GB ${arg}
 		disk=$(losetup --find --show "$arg")
 		sep="p"
 	fi
