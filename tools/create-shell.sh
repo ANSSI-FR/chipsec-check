@@ -74,8 +74,19 @@ install_key_tool () {
 	cp /usr/lib/efitools/x86_64-linux-gnu/HashTool.efi "${HEFI}"
 }
 
+cleanup() {
+	umount_key
+	rmdir "${mount_point}"
+	if [ ! -b "$arg" ];
+	then
+		losetup -d $target
+	fi
+}
+
+
 main () {
 	check_requirements || exit 1
+	trap cleanup ERR
 	arg="${1}"
 	if [ -b "${arg}" ]; #block device, just use it directly
 	then
@@ -99,12 +110,8 @@ main () {
 	install_ca
 	install_shell
 	install_key_tool
-	umount_key
-	rmdir "${mount_point}"
-	if [ ! -b "$arg" ];
-	then
-		losetup -d $target
-	fi
+
+	cleanup
 }
 
 main "${1}"
