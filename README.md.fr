@@ -21,3 +21,10 @@ Les outils fournis permettent de construire deux clés USB bootables:
 	qui sert à inspecter et modifier la liste des clés utilisées dans le cadre de
 	_SecureBoot_. Cette clé USB permet de valider que la plateforme peut être
 	configurée avec des clés _SecureBoot_ personnalisées.
+
+Des versions pré-construites des clés USB sont disponible sous forme d'ISO dans
+la section [releases](releases). Les executable EFI sont signés avec une clé
+généré par le développeur et ne devraien être utilisées qu'à des fins
+d'évaluation. Les utilisateurs sont fortement invités à générer leur propre
+autorité de certification et clés afin d'utiliser celles ci pour des tests
+réels.
