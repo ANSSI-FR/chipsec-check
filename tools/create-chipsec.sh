@@ -153,7 +153,7 @@ main () {
 		usage
 		exit 1
 	fi
-	trap cleanup EXIT
+	trap cleanup ERR
 	if [ -b "${arg}" ]; #block device, just use it directly
 	then
 		disk=${arg}
@@ -196,6 +196,11 @@ main () {
 	umount_debian
 
 	rmdir ${mount_point}
+
+	if [ ! -b "$arg" ];
+	then
+		losetup -d $disk
+	fi
 }
 
 main ${1}
