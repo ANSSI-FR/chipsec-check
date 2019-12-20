@@ -58,18 +58,14 @@ install_ca () {
 install_shell () {
 	EFI="${mount_point}/EFI/Boot/BOOTX64.EFI"
 	mkdir -p "${mount_point}"/EFI/Boot/
-	cp bin/Shell.efi "${EFI}.tmp"
-	sbsign --key ca/DB.key --cert ca/DB.crt --output "${EFI}" "${EFI}.tmp"
-	rm "${EFI}.tmp"
+	sbsign --key ca/DB.key --cert ca/DB.crt --output "${EFI}" bin/Shell.efi
 }
 
 install_key_tool () {
 	KEFI="${mount_point}/KeyTool.EFI"
 	HEFI="${mount_point}/HelloWorld.EFI"
 
-	cp /usr/lib/efitools/x86_64-linux-gnu/KeyTool.efi "${KEFI}.tmp"
-	sbsign --key ca/DB.key --cert ca/DB.crt --output "${KEFI}" "${KEFI}.tmp"
-	rm "${KEFI}.tmp"
+	sbsign --key ca/DB.key --cert ca/DB.crt --output "${KEFI}" /usr/lib/efitools/x86_64-linux-gnu/KeyTool.efi
 
 	cp /usr/lib/efitools/x86_64-linux-gnu/HashTool.efi "${HEFI}"
 }
