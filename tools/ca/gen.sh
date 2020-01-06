@@ -2,6 +2,8 @@
 # Copyright (c) 2015 by Roderick W. Smith
 # Licensed under the terms of the GPL v3
 
+set -e
+
 NAME="SAD Bureautique"
 
 rm *.cer
