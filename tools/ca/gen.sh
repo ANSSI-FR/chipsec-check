@@ -4,7 +4,7 @@
 
 set -e
 
-NAME="SAD Bureautique"
+NAME="chipsec-sec secureboot test"
 
 rm *.cer
 rm *.crt
