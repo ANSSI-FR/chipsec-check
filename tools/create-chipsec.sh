@@ -109,7 +109,7 @@ install_debian () {
 	root="${1}"
 	boot="${2}"
 
-	debootstrap stable "${mount_point}" http://deb.debian.org/debian/
+	debootstrap stable "${mount_point}" https://deb.debian.org/debian/
 
 	mount proc "${mount_point}"/proc -t proc
 	mount sysfs "${mount_point}"/sys -t sysfs
