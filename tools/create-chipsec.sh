@@ -18,11 +18,11 @@ EOF
 }
 
 install_chipsec () {
-	PATH="$PATH:/usr/sbin:/sbin:/bin" chroot "${mount_point}" git clone https://github.com/chipsec/chipsec /root/chipsec
+	do_chroot git clone https://github.com/chipsec/chipsec /root/chipsec
 
 	mkdir -p "${mount_point}"/root
 	cp build-chipsec.sh "${mount_point}"/root/
-	PATH="$PATH:/usr/sbin:/sbin:/bin"  chroot "${mount_point}" /root/build-chipsec.sh
+	do_chroot /root/build-chipsec.sh
 
 	rm "${mount_point}"/root/build-chipsec.sh
 }
@@ -105,6 +105,10 @@ mount_mnt () {
 	mount ${boot} "${mount_point}"/boot
 }
 
+do_chroot() {
+	PATH="$PATH:/usr/sbin:/sbin:/bin" chroot "${mount_point}"/ $*
+}
+
 install_debian () {
 	root="${1}"
 	boot="${2}"
@@ -115,20 +119,20 @@ install_debian () {
 	mount sysfs "${mount_point}"/sys -t sysfs
 	mount -o bind /dev "${mount_point}"/dev
 
-	PATH="$PATH:/usr/sbin:/sbin:/bin" chroot "${mount_point}"/ apt -y install git systemd build-essential gcc make sed nasm python-setuptools linux-image-amd64 linux-headers-amd64 python python-dev grub-efi
+	do_chroot apt -y install git systemd build-essential gcc make sed nasm python-setuptools linux-image-amd64 linux-headers-amd64 python python-dev grub-efi
 
 	echo chipsec > ${mount_point}/etc/hostname
   
 	echo "UUID=$(get_uuid ${root})         /         ext4      defaults      1      1" > "${mount_point}"/etc/fstab
 	echo "UUID=$(get_uuid ${boot})         /boot     vfat      defaults      1      1" >> "${mount_point}"/etc/fstab
 
-	PATH="$PATH:/usr/sbin:/sbin:/bin" chroot "${mount_point}"/ update-grub
-	PATH="$PATH:/usr/sbin:/sbin:/bin" chroot "${mount_point}"/ grub-install --target=x86_64-efi --efi-directory /boot --no-nvram
-	PATH="$PATH:/usr/sbin:/sbin:/bin" chroot "${mount_point}"/ mkdir -p /boot/EFI/Boot
-	PATH="$PATH:/usr/sbin:/sbin:/bin" chroot "${mount_point}"/ cp /boot/EFI/debian/grubx64.efi /boot/EFI/Boot/BOOTX64.EFI
-	PATH="$PATH:/usr/sbin:/sbin:/bin" chroot "${mount_point}"/ grub-mkconfig -o /boot/grub/grub.cfg
+	do_chroot update-grub
+	do_chroot grub-install --target=x86_64-efi --efi-directory /boot --no-nvram
+	do_chroot mkdir -p /boot/EFI/Boot
+	do_chroot cp /boot/EFI/debian/grubx64.efi /boot/EFI/Boot/BOOTX64.EFI
+	do_chroot grub-mkconfig -o /boot/grub/grub.cfg
 
-	PATH="$PATH:/usr/sbin:/sbin:/bin" chroot "${mount_point}"/ passwd -d root
+	do_chroot passwd -d root
 }
 
 umount_debian () {
