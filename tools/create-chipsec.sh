@@ -119,7 +119,10 @@ install_debian () {
 	mount sysfs "${mount_point}"/sys -t sysfs
 	mount -o bind /dev "${mount_point}"/dev
 
-	do_chroot apt -y install git systemd build-essential gcc make sed nasm python-setuptools linux-image-amd64 linux-headers-amd64 python python-dev grub-efi pciutils
+	do_chroot apt -y install systemd linux-image-amd64 grub-efi
+	do_chroot apt -y install git build-essential linux-headers-amd64
+	do_chroot apt -y install python python-dev python-setuptools
+	do_chroot apt -y install sed nasm pciutils
 
 	echo chipsec > ${mount_point}/etc/hostname
   
