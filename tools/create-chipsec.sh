@@ -167,6 +167,10 @@ main () {
 		exit 1
 	fi
 	trap cleanup ERR
+
+	printf "Use ${1}? It will be completely erased (Y/n) "
+	exit_if_no "$(ask_confirm "Y")"
+
 	if [ -b "${arg}" ]; #block device, just use it directly
 	then
 		disk=${arg}
@@ -182,9 +186,6 @@ main () {
 	fi
 
 	mount_point=$(mktemp -d -p "" efiliveXXX)
-
-	printf "Use ${disk}? (Y/n) "
-	exit_if_no "$(ask_confirm "Y")"
 
 	part_disk "${disk}"
 
