@@ -1,19 +1,21 @@
 #!/bin/bash
 set -e
 
-
 usage () {
   cat <<EOF
 NAME
 	${0} - create a minimal linux system with ChipSec
 
 SYNOPSIS
-	${0} DISK
+	${0} DISK [EXTRA_PACKAGES]
 
 DESCRIPTION
 	Create a minimal linux system (with Chipsec installed) on DISK. DISK
 	can be a block device or a file which can then be copied to a disk.
 	The content of DISK is wiped by doing so, so be careful when using this tool.
+
+	[EXTRA_PACKAGES] is a list of extra packages to install on the minimal Linux
+	system.
 EOF
 }
 
@@ -123,6 +125,10 @@ install_debian () {
 	do_chroot apt -y install git build-essential linux-headers-amd64
 	do_chroot apt -y install python python-dev python-setuptools
 	do_chroot apt -y install sed nasm pciutils
+	if [ -n "${extra_packages}" ];
+	then
+		do_chroot apt -y install "${extra_packages}"
+	fi
 
 	echo chipsec > ${mount_point}/etc/hostname
   
@@ -170,6 +176,11 @@ main () {
 		disk=$(losetup --find --show "$arg")
 		sep="p"
 	fi
+	if [ -n "${2}" ];
+	then
+		extra_packages="${2}"
+	fi
+
 	mount_point=$(mktemp -d -p "" efiliveXXX)
 
 	printf "Use ${disk}? (Y/n) "
@@ -210,4 +221,4 @@ main () {
 	fi
 }
 
-main ${1}
+main ${*}
