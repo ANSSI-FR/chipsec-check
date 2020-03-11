@@ -22,6 +22,7 @@ dmidecode > dmidecode-$marque$modele.txt
 lscpu > lscpu-$marque$modele.txt
 dmesg | egrep -i 'iommu|amd-vi|vt-d' > iommu-$marque$modele.txt
 fwupdmgr get-devices > fwupd-${marque}${modele}.txt
+tpm2_getcap properties-fixed > tpm2-${marque}${modele}.txt
 
 chipsec_main -i > chipsec-$marque$modele-v$versionbios.txt
 chipsec_util spi dump spibios-$marque$modele-v$versionbios.bin

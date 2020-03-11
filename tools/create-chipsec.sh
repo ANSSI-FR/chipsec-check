@@ -125,6 +125,8 @@ install_debian () {
 	do_chroot apt -y install git build-essential linux-headers-amd64
 	do_chroot apt -y install python python-dev python-setuptools
 	do_chroot apt -y install sed nasm pciutils fwupd lshw usbutils
+	do_chroot apt -y install tpm2-tools
+
 	if [ -n "${extra_packages}" ];
 	then
 		do_chroot apt -y install "${extra_packages}"
