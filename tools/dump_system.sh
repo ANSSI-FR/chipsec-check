@@ -15,7 +15,6 @@ fi
 export versionbios=$(dmidecode --type 0 | grep "Version:" | cut -d : -f 2 | tr -d " ") 
 echo "Lancement des commandes sur $marque $modele avec version BIOS $versionbios"
 
-cd mount
 lshw > lshw-$marque$modele.txt
 lsusb > lsusb-$marque$modele.txt
 lspci > lspci-$marque$modele.txt
