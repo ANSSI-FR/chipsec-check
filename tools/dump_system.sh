@@ -1,29 +1,20 @@
 #!/bin/bash
-echo "Lancement des commandes sur :"
-export marque=$1
-export modele=$2
-if [ -z "$marque" ]  
-then 
-	echo "Usage: $0 MARQUE modele"
-	exit
-fi
-if [ -z "$modele" ]
-then
-	echo "Usage: $0 MARQUE modele"
-	exit
-fi
-export versionbios=$(dmidecode --type 0 | grep "Version:" | cut -d : -f 2 | tr -d " ") 
-echo "Lancement des commandes sur $marque $modele avec version BIOS $versionbios"
+systemmanufacturer=$(dmidecode --string system-manufacturer | tr " " _)
+systemversion=$(dmidecode --string system-version | tr " " _)
+biosversion=$(dmidecode --string bios-version | tr " " _)
+echo "Lancement des commandes sur ${systemmanufacturer} ${systemversion} avec version BIOS ${biosversion}"
 
-lshw > lshw-$marque$modele.txt
-lsusb > lsusb-$marque$modele.txt
-lspci > lspci-$marque$modele.txt
-dmidecode > dmidecode-$marque$modele.txt
-lscpu > lscpu-$marque$modele.txt
-dmesg | egrep -i 'iommu|amd-vi|vt-d' > iommu-$marque$modele.txt
-fwupdmgr get-devices > fwupd-${marque}${modele}.txt
-tpm2_getcap properties-fixed > tpm2-${marque}${modele}.txt
+dir="${systemmanufacturer}_${systemversion}"
+mkdir -p "${dir}"
+lshw > "${dir}/lshw.txt"
+lsusb > "${dir}/lsusb.txt"
+lspci -vvvnn > "${dir}/lspci.txt"
+dmidecode -u > "${dir}/dmidecode.txt"
+lscpu > "${dir}/lscpu.txt"
+dmesg | egrep -i 'iommu|amd-vi|vt-d' > "${dir}/iommu.txt"
+fwupdmgr get-devices > "${dir}/fwupd.txt"
+tpm2_getcap -c properties-fixed > "${dir}/tpm2.txt"
 
-chipsec_main -i > chipsec-$marque$modele-v$versionbios.txt
-chipsec_util spi dump spibios-$marque$modele-v$versionbios.bin
-ls -lstrh
+chipsec_main -i > "${dir}/chipsec_v${biosversion}.txt"
+chipsec_util spi dump "${dir}/spibios_v${biosversion}.bin"
+ls -lstrh "${dir}"
