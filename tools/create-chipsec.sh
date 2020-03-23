@@ -31,6 +31,7 @@ install_chipsec () {
 
 sign_grub_boot () {
 	EFI="${mount_point}/boot/EFI/Boot/BOOTX64.EFI"
+	mkdir -p ${EFI%/*}
 	sbsign --key ca/DB.key --cert ca/DB.crt --output ${EFI}.signed ${EFI}
 	mv ${EFI}.signed ${EFI}
 }
@@ -92,6 +93,7 @@ format_boot () {
 	mkfs.vfat ${boot}
 }
 
+
 format_root () {
 	root=${1}
 	sleep 1
@@ -145,6 +147,29 @@ install_debian () {
 
 	do_chroot passwd -d root
 }
+
+install_ca () {
+	mkdir -p "${mount_point}"/boot/EFI/keytool
+	cp ca/*.auth ca/*.esl "${mount_point}"/boot/EFI/keytool
+	mkdir -p "${mount_point}"/boot/EFI/builtin
+	cp ca/*.cer "${mount_point}"/boot/EFI/builtin
+}
+
+install_shell () {
+	EFI="${mount_point}/boot/EFI/Boot/Shell.efi"
+	mkdir -p ${EFI%/*}
+	sbsign --key ca/DB.key --cert ca/DB.crt --output "${EFI}" bin/Shell.efi
+}
+
+install_key_tool () {
+	KEFI="${mount_point}/boot/EFI/KeyTool.EFI"
+	HEFI="${mount_point}/boot/EFI/HelloWorld.EFI"
+
+	sbsign --key ca/DB.key --cert ca/DB.crt --output "${KEFI}" /usr/lib/efitools/x86_64-linux-gnu/KeyTool.efi
+
+	cp /usr/lib/efitools/x86_64-linux-gnu/HashTool.efi "${HEFI}"
+}
+
 
 umount_debian () {
 	umount "${mount_point}"/dev/
@@ -201,6 +226,10 @@ main () {
 	format_root "${root}"
 
 	mount_mnt "${boot}" "${root}"
+
+	install_ca
+	install_shell
+	install_key_tool
 
 	install_debian "${root}" "${boot}"
 
