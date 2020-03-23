@@ -57,7 +57,7 @@ install_ca () {
 
 install_shell () {
 	EFI="${mount_point}/EFI/Boot/BOOTX64.EFI"
-	mkdir -p "${mount_point}"/EFI/Boot/
+	mkdir -p "${EFI%/*}"
 	sbsign --key ca/DB.key --cert ca/DB.crt --output "${EFI}" bin/Shell.efi
 }
 
