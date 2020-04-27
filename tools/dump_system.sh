@@ -4,7 +4,12 @@ systemversion=$(dmidecode --string system-version | tr " " _)
 biosversion=$(dmidecode --string bios-version | tr " " _)
 echo "Lancement des commandes sur ${systemmanufacturer} ${systemversion} avec version BIOS ${biosversion}"
 
-dir="${systemmanufacturer}_${systemversion}"
+if [ -z "$1" ];
+then
+	dir="${systemmanufacturer}_${systemversion}"
+else
+	dir="$1"
+fi
 mkdir -p "${dir}"
 lshw > "${dir}/lshw.txt"
 lsusb > "${dir}/lsusb.txt"
