@@ -30,10 +30,10 @@ install_chipsec () {
 }
 
 sign_grub_boot () {
-	EFI="${mount_point}/boot/EFI/Boot/BOOTX64.EFI"
+	GRUB="${mount_point}/boot/EFI/debian/grubx64.efi"
+	BOOT="${mount_point}/boot/EFI/Boot/BOOTX64.EFI"
 	mkdir -p ${EFI%/*}
-	sbsign --key ca/DB.key --cert ca/DB.crt --output ${EFI}.signed ${EFI}
-	mv ${EFI}.signed ${EFI}
+	sbsign --key ca/DB.key --cert ca/DB.crt --output ${BOOT} ${GRUB}
 }
 
 get_partuuid () {
@@ -142,7 +142,6 @@ install_debian () {
 	do_chroot update-grub
 	do_chroot grub-install --target=x86_64-efi --efi-directory /boot --no-nvram
 	do_chroot mkdir -p /boot/EFI/Boot
-	do_chroot cp /boot/EFI/debian/grubx64.efi /boot/EFI/Boot/BOOTX64.EFI
 	do_chroot grub-mkconfig -o /boot/grub/grub.cfg
 
 	do_chroot passwd -d root
