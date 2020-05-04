@@ -7,20 +7,28 @@ NAME
 	${0} - create a minimal linux system with ChipSec
 
 SYNOPSIS
-	${0} DISK [EXTRA_PACKAGES]
+	${0} -d DISK [-c <commit>] [-e "EXTRA PACKAGES"]
 
 DESCRIPTION
 	Create a minimal linux system (with Chipsec installed) on DISK. DISK
 	can be a block device or a file which can then be copied to a disk.
 	The content of DISK is wiped by doing so, so be careful when using this tool.
 
-	[EXTRA_PACKAGES] is a list of extra packages to install on the minimal Linux
-	system.
+	<commit> is the optional Chipsec commit ID or tag which will be cloned to
+	DISK. If absent, master is used.
+
+	"EXTRA_PACKAGES" is a quoted, space separated list of extra packages to
+	install on the minimal Linux system.
 EOF
 }
 
 install_chipsec () {
-	do_chroot git clone https://github.com/chipsec/chipsec /root/chipsec
+	if [ -n "$commit" ];
+	then
+		do_chroot git clone -b $commit https://github.com/chipsec/chipsec /root/chipsec
+	else
+		do_chroot git clone https://github.com/chipsec/chipsec /root/chipsec
+	fi
 
 	mkdir -p "${mount_point}"/root
 	cp build-chipsec.sh "${mount_point}"/root/
@@ -186,7 +194,25 @@ cleanup() {
 }
 
 main () {
-	arg="${1}"
+	while getopts "c:d:e:" opt; do
+		case $opt in
+			c)
+				echo "Chipsec commit: ${OPTARG}"
+				commit=${OPTARG}
+				;;
+			d)
+				echo "Destination: ${OPTARG}"
+				arg=${OPTARG}
+				;;
+			e)
+				echo "Extra packages to install: ${OPTARG}"
+				extra_packages="${OPTARG}"
+				;;
+			*)
+				usage
+				;;
+		esac
+	done
 	if [ -z "${arg}" ];
 	then
 		usage
@@ -194,7 +220,8 @@ main () {
 	fi
 	trap cleanup ERR
 
-	printf "Use ${1}? It will be completely erased (Y/n) "
+
+	printf "Use ${arg}? It will be completely erased (Y/n) "
 	exit_if_no "$(ask_confirm "Y")"
 
 	if [ -b "${arg}" ]; #block device, just use it directly
@@ -205,10 +232,6 @@ main () {
 		truncate -s 2GB ${arg}
 		disk=$(losetup --find --show "$arg")
 		sep="p"
-	fi
-	if [ -n "${2}" ];
-	then
-		extra_packages="${2}"
 	fi
 
 	mount_point=$(mktemp -d -p "" efiliveXXX)
@@ -252,4 +275,4 @@ main () {
 	fi
 }
 
-main ${*}
+main "${@}"
