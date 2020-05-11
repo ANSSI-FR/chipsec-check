@@ -181,13 +181,16 @@ install_shell () {
 	sbsign --key ca/DB.key --cert ca/DB.crt --output "${EFI}" bin/Shell.efi
 }
 
-install_key_tool () {
-	KEFI="${mount_point}/boot/EFI/KeyTool.EFI"
-	HEFI="${mount_point}/boot/EFI/HelloWorld.EFI"
+install_keytool () {
+	KEFI="${mount_point}/boot/EFI/keytool/KeyTool.EFI"
+	HEFI="${mount_point}/boot/EFI/keytool/HelloWorld.EFI"
+	CFG="${mount_point}/boot/EFI/keytool/BOOTX64.csv"
 
+	mkdir -p ${KEFI%/*}
 	sbsign --key ca/DB.key --cert ca/DB.crt --output "${KEFI}" /usr/lib/efitools/x86_64-linux-gnu/KeyTool.efi
 
 	cp /usr/lib/efitools/x86_64-linux-gnu/HashTool.efi "${HEFI}"
+	echo "KeyTool.efi,keytool,,Start Secureboot keys management tool" |iconv -t UCS-2 > ${CFG}
 }
 
 
@@ -264,7 +267,7 @@ main () {
 
 	install_ca
 	install_shell
-	install_key_tool
+	install_keytool
 
 	install_debian "${root}" "${boot}"
 
