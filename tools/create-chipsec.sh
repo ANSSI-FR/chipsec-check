@@ -171,10 +171,8 @@ install_debian () {
 }
 
 install_ca () {
-	mkdir -p "${mount_point}"/boot/EFI/keytool
-	cp ca/*.auth ca/*.esl "${mount_point}"/boot/EFI/keytool
-	mkdir -p "${mount_point}"/boot/EFI/builtin
-	cp ca/*.cer "${mount_point}"/boot/EFI/builtin
+	mkdir -p "${mount_point}"/boot/EFI/keys
+	cp ca/*.auth ca/*.esl "${mount_point}"/boot/EFI/keys
 }
 
 install_shell () {
