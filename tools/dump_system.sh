@@ -20,6 +20,6 @@ dmesg | egrep -i 'iommu|amd-vi|vt-d' > "${dir}/iommu.txt"
 fwupdmgr get-devices > "${dir}/fwupd.txt"
 tpm2_getcap -c properties-fixed > "${dir}/tpm2.txt"
 
-chipsec_main -i > "${dir}/chipsec_v${biosversion}.txt"
+chipsec_main -i -k "${dir}/chipsec_v${biosversion}.md"
 chipsec_util spi dump "${dir}/spibios_v${biosversion}.bin"
 ls -lstrh "${dir}"
