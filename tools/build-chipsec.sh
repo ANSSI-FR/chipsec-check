@@ -6,4 +6,4 @@ current_kernel () {
 }
 
 cd /root/chipsec
-KERNEL_SRC_DIR="$(current_kernel)" python2 setup.py install
+KERNEL_SRC_DIR="$(current_kernel)" python3 setup.py install

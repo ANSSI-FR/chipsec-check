@@ -133,7 +133,7 @@ install_debian () {
 
 	do_chroot apt -y install systemd linux-image-amd64 grub-efi
 	do_chroot apt -y install git build-essential linux-headers-amd64
-	do_chroot apt -y install python python-dev python-setuptools
+	do_chroot apt -y install python3 python3-dev python3-setuptools
 	do_chroot apt -y install sed nasm pciutils fwupd lshw usbutils
 	do_chroot apt -y install tpm2-tools
 
