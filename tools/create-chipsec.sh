@@ -37,12 +37,27 @@ install_chipsec () {
 	rm "${mount_point}"/root/build-chipsec.sh
 }
 
-sign_grub_boot () {
+sign_grub () {
 	GRUB="${mount_point}/boot/EFI/debian/grubx64.efi"
-	BOOT="${mount_point}/boot/EFI/Boot/BOOTX64.EFI"
-	mkdir -p ${EFI%/*}
-	sbsign --key ca/DB.key --cert ca/DB.crt --output ${BOOT} ${GRUB}
+	sbsign --key ca/DB.key --cert ca/DB.crt --output ${GRUB} ${GRUB}
 }
+
+sign_shim_boot () {
+	SHIM="${mount_point}/boot/EFI/debian/shimx64.efi"
+	BOOT="${mount_point}/boot/EFI/Boot/bootx64.efi"
+	# Fallback binary with bootx64.csv config file
+	FB="${mount_point}/boot/EFI/debian/fbx64.efi"
+	CFG="${mount_point}/boot/EFI/debian/BOOTX64.csv"
+	sbsign --key ca/DB.key --cert ca/DB.crt --output ${SHIM} ${SHIM}
+	sbsign --key ca/DB.key --cert ca/DB.crt --output ${BOOT} ${FB}
+	echo "shimx64.efi,chipsec,,Start Chipsec Debian distribution" |iconv -t UCS-2 > ${CFG}
+}
+
+sign_kernel () {
+	KERNEL="${mount_point}/boot/vmlinuz*"
+	sbsign --key ca/DB.key --cert ca/DB.crt --output ${KERNEL} ${KERNEL}
+}
+
 
 get_partuuid () {
 	disk="${1}"
@@ -255,7 +270,10 @@ main () {
 
 	install_debian "${root}" "${boot}"
 
-	sign_grub_boot
+	# Sign the boot entries with our own custom SecureBoot keys
+	sign_grub
+	sign_shim_boot
+	sign_kernel
 
 	install_chipsec
 
