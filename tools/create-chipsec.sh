@@ -38,40 +38,45 @@ install_chipsec () {
 }
 
 sign_grub () {
-	GRUB="${mount_point}/boot/EFI/debian/grubx64.efi"
+	local GRUB="${mount_point}/boot/EFI/debian/grubx64.efi"
 	sbsign --key "$SRCDIR/ca/DB.key" --cert "$SRCDIR/ca/DB.crt" --output ${GRUB} ${GRUB}
 }
 
 sign_shim_boot () {
-	SHIM="${mount_point}/boot/EFI/debian/shimx64.efi"
-	BOOT="${mount_point}/boot/EFI/Boot/bootx64.efi"
+	local SHIM="${mount_point}/boot/EFI/debian/shimx64.efi"
+	local BOOT="${mount_point}/boot/EFI/Boot/bootx64.efi"
 	# Fallback binary with bootx64.csv config file
-	FB="${mount_point}/boot/EFI/debian/fbx64.efi"
-	CFG="${mount_point}/boot/EFI/debian/BOOTX64.csv"
+	local FB="${mount_point}/boot/EFI/debian/fbx64.efi"
+	local CFG="${mount_point}/boot/EFI/debian/BOOTX64.csv"
+
 	sbsign --key "$SRCDIR/ca/DB.key" --cert "$SRCDIR/ca/DB.crt" --output ${SHIM} ${SHIM}
 	sbsign --key "$SRCDIR/ca/DB.key" --cert "$SRCDIR/ca/DB.crt" --output ${BOOT} ${FB}
+
 	echo "shimx64.efi,chipsec,,Start Chipsec Debian distribution" |iconv -t UCS-2 > ${CFG}
 }
 
 sign_kernel () {
-	KERNEL="${mount_point}/boot/vmlinuz*"
+	local KERNEL="${mount_point}/boot/vmlinuz*"
+
 	sbsign --key "$SRCDIR/ca/DB.key" --cert "$SRCDIR/ca/DB.crt" --output ${KERNEL} ${KERNEL}
 }
 
 
 get_partuuid () {
-	disk="${1}"
+	local disk="${1}"
+
 	echo $(blkid ${disk} | sed 's/.*PARTUUID="\(.*\)".*/\1/')
 }
 
 get_uuid () {
-	disk="${1}"
+	local disk="${1}"
+
 	echo $(blkid ${disk} | sed 's/.* UUID="\(.*\)" T.*/\1/')
 }
 
 ask_confirm () {
-	c=""
-	default="${1}"
+	local c=""
+	local default="${1}"
 
 	read -r -n1 c
 
@@ -102,7 +107,7 @@ exit_if_no () {
 }
 
 part_disk () {
-	disk=${1}
+	local disk=${1}
 
 	parted "${1}" --script mklabel gpt
 	parted "${1}" --script mkpart ESP fat32 1MiB 100MiB
@@ -111,21 +116,23 @@ part_disk () {
 }
 
 format_boot () {
-	boot=${1}
+	local boot=${1}
+
 	sleep 1
 	mkfs.vfat ${boot}
 }
 
 
 format_root () {
-	root=${1}
+	local root=${1}
+
 	sleep 1
 	mkfs.ext4 -F ${root}
 }
 
 mount_mnt () {
-	boot="${1}"
-	root="${2}"
+	local boot="${1}"
+	local root="${2}"
 
 	mount ${root} "${mount_point}"
 	mkdir -p "${mount_point}"/boot
@@ -137,8 +144,8 @@ do_chroot() {
 }
 
 install_debian () {
-	root="${1}"
-	boot="${2}"
+	local root="${1}"
+	local boot="${2}"
 
 	debootstrap stable "${mount_point}" https://deb.debian.org/debian/
 
@@ -176,17 +183,18 @@ install_ca () {
 }
 
 install_shell () {
-	EFI="${mount_point}/boot/EFI/Boot/Shell.efi"
-	CFG="${mount_point}/boot/EFI/Boot/BOOTX64.csv"
+	local EFI="${mount_point}/boot/EFI/Boot/Shell.efi"
+	local CFG="${mount_point}/boot/EFI/Boot/BOOTX64.csv"
+
 	mkdir -p ${EFI%/*}
 	sbsign --key "$SRCDIR/ca/DB.key" --cert "$SRCDIR/ca/DB.crt" --output "${EFI}" "$SRCDIR/bin/Shell.efi"
 	echo "Shell.efi,shell,,Start the UEFI shell" |iconv -t UCS-2 > ${CFG}
 }
 
 install_keytool () {
-	KEFI="${mount_point}/boot/EFI/keytool/KeyTool.EFI"
-	HEFI="${mount_point}/boot/EFI/keytool/HelloWorld.EFI"
-	CFG="${mount_point}/boot/EFI/keytool/BOOTX64.csv"
+	local KEFI="${mount_point}/boot/EFI/keytool/KeyTool.EFI"
+	local HEFI="${mount_point}/boot/EFI/keytool/HelloWorld.EFI"
+	local CFG="${mount_point}/boot/EFI/keytool/BOOTX64.csv"
 
 	mkdir -p ${KEFI%/*}
 	sbsign --key "$SRCDIR/ca/DB.key" --cert "$SRCDIR/ca/DB.crt" --output "${KEFI}" /usr/lib/efitools/x86_64-linux-gnu/KeyTool.efi
