@@ -31,7 +31,7 @@ install_chipsec () {
 	fi
 
 	mkdir -p "${mount_point}"/root
-	cp build-chipsec.sh "${mount_point}"/root/
+	cp "$SRCDIR/build-chipsec.sh" "${mount_point}"/root/
 	do_chroot /root/build-chipsec.sh
 
 	rm "${mount_point}"/root/build-chipsec.sh
@@ -39,7 +39,7 @@ install_chipsec () {
 
 sign_grub () {
 	GRUB="${mount_point}/boot/EFI/debian/grubx64.efi"
-	sbsign --key ca/DB.key --cert ca/DB.crt --output ${GRUB} ${GRUB}
+	sbsign --key "$SRCDIR/ca/DB.key" --cert "$SRCDIR/ca/DB.crt" --output ${GRUB} ${GRUB}
 }
 
 sign_shim_boot () {
@@ -48,14 +48,14 @@ sign_shim_boot () {
 	# Fallback binary with bootx64.csv config file
 	FB="${mount_point}/boot/EFI/debian/fbx64.efi"
 	CFG="${mount_point}/boot/EFI/debian/BOOTX64.csv"
-	sbsign --key ca/DB.key --cert ca/DB.crt --output ${SHIM} ${SHIM}
-	sbsign --key ca/DB.key --cert ca/DB.crt --output ${BOOT} ${FB}
+	sbsign --key "$SRCDIR/ca/DB.key" --cert "$SRCDIR/ca/DB.crt" --output ${SHIM} ${SHIM}
+	sbsign --key "$SRCDIR/ca/DB.key" --cert "$SRCDIR/ca/DB.crt" --output ${BOOT} ${FB}
 	echo "shimx64.efi,chipsec,,Start Chipsec Debian distribution" |iconv -t UCS-2 > ${CFG}
 }
 
 sign_kernel () {
 	KERNEL="${mount_point}/boot/vmlinuz*"
-	sbsign --key ca/DB.key --cert ca/DB.crt --output ${KERNEL} ${KERNEL}
+	sbsign --key "$SRCDIR/ca/DB.key" --cert "$SRCDIR/ca/DB.crt" --output ${KERNEL} ${KERNEL}
 }
 
 
@@ -172,14 +172,14 @@ install_debian () {
 
 install_ca () {
 	mkdir -p "${mount_point}"/boot/EFI/keys
-	cp ca/*.auth ca/*.esl "${mount_point}"/boot/EFI/keys
+	cp "$SRCDIR"/ca/*.auth "$SRCDIR"/ca/*.esl "${mount_point}"/boot/EFI/keys/
 }
 
 install_shell () {
 	EFI="${mount_point}/boot/EFI/Boot/Shell.efi"
 	CFG="${mount_point}/boot/EFI/Boot/BOOTX64.csv"
 	mkdir -p ${EFI%/*}
-	sbsign --key ca/DB.key --cert ca/DB.crt --output "${EFI}" bin/Shell.efi
+	sbsign --key "$SRCDIR/ca/DB.key" --cert "$SRCDIR/ca/DB.crt" --output "${EFI}" "$SRCDIR/bin/Shell.efi"
 	echo "Shell.efi,shell,,Start the UEFI shell" |iconv -t UCS-2 > ${CFG}
 }
 
@@ -189,7 +189,7 @@ install_keytool () {
 	CFG="${mount_point}/boot/EFI/keytool/BOOTX64.csv"
 
 	mkdir -p ${KEFI%/*}
-	sbsign --key ca/DB.key --cert ca/DB.crt --output "${KEFI}" /usr/lib/efitools/x86_64-linux-gnu/KeyTool.efi
+	sbsign --key "$SRCDIR/ca/DB.key" --cert "$SRCDIR/ca/DB.crt" --output "${KEFI}" /usr/lib/efitools/x86_64-linux-gnu/KeyTool.efi
 
 	cp /usr/lib/efitools/x86_64-linux-gnu/HashTool.efi "${HEFI}"
 	echo "KeyTool.efi,keytool,,Start Secureboot keys management tool" |iconv -t UCS-2 > ${CFG}
@@ -281,9 +281,9 @@ main () {
 	install_chipsec
 
 	# Install the dump_system script if possible
-	if [ -f $(dirname $0)/dump_system.sh ];
+	if [ -f "$SRCDIR/dump_system.sh" ];
 	then
-		cp $(dirname $0)/dump_system.sh ${mount_point}/root/
+		cp "$SRCDIR/dump_system.sh" "${mount_point}/root/"
 	fi
 
 	umount_debian
@@ -296,4 +296,5 @@ main () {
 	fi
 }
 
+SRCDIR="$(dirname $0)"
 main "${@}"
