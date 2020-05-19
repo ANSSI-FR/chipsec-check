@@ -59,6 +59,11 @@ sign_kernel () {
 	local KERNEL="${mount_point}/boot/vmlinuz*"
 
 	sbsign --key "$SRCDIR/ca/DB.key" --cert "$SRCDIR/ca/DB.crt" --output ${KERNEL} ${KERNEL}
+
+	# Also sign the Chipsec module
+	"${mount_point}"/usr/lib/linux-kbuild-4.19/scripts/sign-file \
+		sha256 "${SRCDIR}"/ca/DB.key "${SRCDIR}"/ca/DB.crt \
+		"${mount_point}"/usr/local/lib/python*/dist-packages/chipsec-*/chipsec/helper/linux/chipsec.ko
 }
 
 
@@ -281,11 +286,6 @@ main () {
 
 	install_debian "${root}" "${boot}"
 
-	# Sign the boot entries with our own custom SecureBoot keys
-	sign_grub
-	sign_shim_boot
-	sign_kernel
-
 	install_chipsec
 
 	# Install the dump_system script if possible
@@ -293,6 +293,12 @@ main () {
 	then
 		cp "$SRCDIR/dump_system.sh" "${mount_point}/root/"
 	fi
+
+	# Sign the boot entries with our own custom SecureBoot keys
+	sign_grub
+	sign_shim_boot
+	sign_kernel
+
 
 	umount_debian
 
