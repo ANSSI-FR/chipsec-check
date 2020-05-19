@@ -25,11 +25,11 @@ then
 	exit 1
 fi
 
-rm *.cer
-rm *.crt
-rm *.key
-rm *.esl
-rm *.auth
+SRCDIR="$(dirname $0)"
+DSTDIR="$SRCDIR/ca"
+mkdir -p $DSTDIR
+cd $DSTDIR
+rm -f *.cer *.crt *.key *.esl *.auth myGUID.txt
 
 openssl req -new -x509 -newkey rsa:2048 -subj "/CN=$NAME PK/" -keyout PK.key \
         -out PK.crt -days 3650 -nodes -sha256
