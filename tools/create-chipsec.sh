@@ -77,12 +77,6 @@ get_partuuid () {
 	echo $(blkid ${disk} | sed 's/.*PARTUUID="\(.*\)".*/\1/')
 }
 
-get_uuid () {
-	local disk="${1}"
-
-	echo $(blkid ${disk} | sed 's/.* UUID="\(.*\)" T.*/\1/')
-}
-
 ask_confirm () {
 	local c=""
 	local default="${1}"
@@ -175,8 +169,8 @@ install_debian () {
 
 	echo chipsec > ${mount_point}/etc/hostname
   
-	echo "UUID=$(get_uuid ${root})         /         ext4      defaults      1      1" > "${mount_point}"/etc/fstab
-	echo "UUID=$(get_uuid ${boot})         /boot     vfat      defaults      1      1" >> "${mount_point}"/etc/fstab
+	echo "$(lsblk -n -o UUID -P ${root})         /         ext4      defaults      1      1" > "${mount_point}"/etc/fstab
+	echo "$(lsblk -n -o UUID -P ${boot})         /boot     vfat      defaults      1      1" >> "${mount_point}"/etc/fstab
 
 	do_chroot update-grub
 	do_chroot grub-install --target=x86_64-efi --efi-directory /boot --no-nvram
