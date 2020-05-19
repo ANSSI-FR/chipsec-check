@@ -7,7 +7,7 @@ NAME
 	${0} - create a minimal linux system with ChipSec
 
 SYNOPSIS
-	${0} -d DISK [-c <commit>] [-e "EXTRA PACKAGES"]
+	${0} -d DISK [-c <commit>] [-e "EXTRA PACKAGES"] [ -k "Path to keys folder" ]
 
 DESCRIPTION
 	Create a minimal linux system (with Chipsec installed) on DISK. DISK
@@ -19,6 +19,10 @@ DESCRIPTION
 
 	"EXTRA_PACKAGES" is a quoted, space separated list of extra packages to
 	install on the minimal Linux system.
+
+	You can provide a path to the sets of keys to be used for Secure Boot
+	signing. Default is to use the ca/ subfolder in the script source dir
+	(following layout from upstream repository)
 EOF
 }
 
@@ -39,7 +43,7 @@ install_chipsec () {
 
 sign_grub () {
 	local GRUB="${mount_point}/boot/EFI/debian/grubx64.efi"
-	sbsign --key "$SRCDIR/ca/DB.key" --cert "$SRCDIR/ca/DB.crt" --output ${GRUB} ${GRUB}
+	sbsign --key "$keypath"/DB.key --cert "$keypath"/DB.crt --output ${GRUB} ${GRUB}
 }
 
 sign_shim_boot () {
@@ -49,8 +53,8 @@ sign_shim_boot () {
 	local FB="${mount_point}/boot/EFI/debian/fbx64.efi"
 	local CFG="${mount_point}/boot/EFI/debian/BOOTX64.csv"
 
-	sbsign --key "$SRCDIR/ca/DB.key" --cert "$SRCDIR/ca/DB.crt" --output ${SHIM} ${SHIM}
-	sbsign --key "$SRCDIR/ca/DB.key" --cert "$SRCDIR/ca/DB.crt" --output ${BOOT} ${FB}
+	sbsign --key "$keypath"/DB.key --cert "$keypath"/DB.crt --output ${SHIM} ${SHIM}
+	sbsign --key "$keypath"/DB.key --cert "$keypath"/DB.crt --output ${BOOT} ${FB}
 
 	echo "shimx64.efi,chipsec,,Start Chipsec Debian distribution" |iconv -t UCS-2 > ${CFG}
 }
@@ -58,11 +62,11 @@ sign_shim_boot () {
 sign_kernel () {
 	local KERNEL="${mount_point}/boot/vmlinuz*"
 
-	sbsign --key "$SRCDIR/ca/DB.key" --cert "$SRCDIR/ca/DB.crt" --output ${KERNEL} ${KERNEL}
+	sbsign --key "$keypath"/DB.key --cert "$keypath"/DB.crt --output ${KERNEL} ${KERNEL}
 
 	# Also sign the Chipsec module
 	"${mount_point}"/usr/lib/linux-kbuild-4.19/scripts/sign-file \
-		sha256 "${SRCDIR}"/ca/DB.key "${SRCDIR}"/ca/DB.crt \
+		sha256 "$keypath"/DB.key "$keypath"/DB.crt \
 		"${mount_point}"/usr/local/lib/python*/dist-packages/chipsec-*/chipsec/helper/linux/chipsec.ko
 }
 
@@ -184,7 +188,7 @@ install_debian () {
 
 install_ca () {
 	mkdir -p "${mount_point}"/boot/EFI/keys
-	cp "$SRCDIR"/ca/*.auth "$SRCDIR"/ca/*.esl "${mount_point}"/boot/EFI/keys/
+	cp "$keypath"/*.auth "$keypath"/*.esl "${mount_point}"/boot/EFI/keys/
 }
 
 install_shell () {
@@ -192,7 +196,7 @@ install_shell () {
 	local CFG="${mount_point}/boot/EFI/Boot/BOOTX64.csv"
 
 	mkdir -p ${EFI%/*}
-	sbsign --key "$SRCDIR/ca/DB.key" --cert "$SRCDIR/ca/DB.crt" --output "${EFI}" "$SRCDIR/bin/Shell.efi"
+	sbsign --key "$keypath"/DB.key --cert "$keypath"/DB.crt --output "${EFI}" "$SRCDIR/bin/Shell.efi"
 	echo "Shell.efi,shell,,Start the UEFI shell" |iconv -t UCS-2 > ${CFG}
 }
 
@@ -202,7 +206,7 @@ install_keytool () {
 	local CFG="${mount_point}/boot/EFI/keytool/BOOTX64.csv"
 
 	mkdir -p ${KEFI%/*}
-	sbsign --key "$SRCDIR/ca/DB.key" --cert "$SRCDIR/ca/DB.crt" --output "${KEFI}" /usr/lib/efitools/x86_64-linux-gnu/KeyTool.efi
+	sbsign --key "$keypath"/DB.key --cert "$keypath"/DB.crt --output "${KEFI}" /usr/lib/efitools/x86_64-linux-gnu/KeyTool.efi
 
 	cp /usr/lib/efitools/x86_64-linux-gnu/HashTool.efi "${HEFI}"
 	echo "KeyTool.efi,keytool,,Start Secureboot keys management tool" |iconv -t UCS-2 > ${CFG}
@@ -225,7 +229,7 @@ cleanup() {
 }
 
 main () {
-	while getopts "c:d:e:" opt; do
+	while getopts "c:d:e:k:" opt; do
 		case $opt in
 			c)
 				echo "Chipsec commit: ${OPTARG}"
@@ -238,6 +242,10 @@ main () {
 			e)
 				echo "Extra packages to install: ${OPTARG}"
 				extra_packages="${OPTARG}"
+				;;
+			k)
+				echo "Path to keys: ${OPTARG}"
+				keypath="${OPTARG}"
 				;;
 			*)
 				usage
@@ -263,6 +271,11 @@ main () {
 		truncate -s 2GB ${arg}
 		disk=$(losetup --find --show "$arg")
 		sep="p"
+	fi
+
+	if [ -z "${keypath}" ];
+	then
+		keypath="$SRCDIR"/ca
 	fi
 
 	mount_point=$(mktemp -d -p "" efiliveXXX)
