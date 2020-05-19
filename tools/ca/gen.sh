@@ -19,6 +19,12 @@ then
 	fi
 fi
 
+if ! type uuid &> /dev/null;
+then
+	echo "uuid binary not found in PATH. Please install the uuid binary (apt install uuid on Debian and derivatives)" >&2
+	exit 1
+fi
+
 rm *.cer
 rm *.crt
 rm *.key
@@ -35,7 +41,7 @@ openssl x509 -in PK.crt -out PK.cer -outform DER
 openssl x509 -in KEK.crt -out KEK.cer -outform DER
 openssl x509 -in DB.crt -out DB.cer -outform DER
 
-GUID=`python2 -c 'import uuid; print str(uuid.uuid1())'`
+GUID=$(uuid)
 echo $GUID > myGUID.txt
 
 cert-to-efi-sig-list -g $GUID PK.crt PK.esl
