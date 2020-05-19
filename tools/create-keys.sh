@@ -4,9 +4,7 @@
 #usb key 2 (shell.efi) > ./create-keys.sh shell /dev/sdc
 
 generate_keys () {
-    cd ca
-    ./gen.sh
-    cd ..
+    ./gen-keys.sh
 }
 
 usage() {
