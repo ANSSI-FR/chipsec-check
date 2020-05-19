@@ -299,6 +299,7 @@ main () {
 	sign_shim_boot
 	sign_kernel
 
+	echo -e "\n\nChipsec key built on $(date -R)" >> "${mount_point}"/etc/motd
 
 	umount_debian
 
