@@ -50,22 +50,22 @@ umount_key () {
 
 install_ca () {
 	mkdir "${mount_point}"/keytool
-	cp ca/*.auth ca/*.esl "${mount_point}"/keytool
+	cp "${SRCDIR}"/ca/*.auth "${SRCDIR}"/ca/*.esl "${mount_point}"/keytool
 	mkdir "${mount_point}"/builtin
-	cp ca/*.cer "${mount_point}"/builtin
+	cp "${SRCDIR}"/ca/*.cer "${mount_point}"/builtin
 }
 
 install_shell () {
 	EFI="${mount_point}/EFI/Boot/BOOTX64.EFI"
 	mkdir -p "${EFI%/*}"
-	sbsign --key ca/DB.key --cert ca/DB.crt --output "${EFI}" bin/Shell.efi
+	sbsign --key "${SRCDIR}"/ca/DB.key --cert "${SRCDIR}"/ca/DB.crt --output "${EFI}" "${SRCDIR}"/bin/Shell.efi
 }
 
 install_key_tool () {
 	KEFI="${mount_point}/KeyTool.EFI"
 	HEFI="${mount_point}/HelloWorld.EFI"
 
-	sbsign --key ca/DB.key --cert ca/DB.crt --output "${KEFI}" /usr/lib/efitools/x86_64-linux-gnu/KeyTool.efi
+	sbsign --key "${SRCDIR}"/ca/DB.key --cert "${SRCDIR}"/ca/DB.crt --output "${KEFI}" /usr/lib/efitools/x86_64-linux-gnu/KeyTool.efi
 
 	cp /usr/lib/efitools/x86_64-linux-gnu/HashTool.efi "${HEFI}"
 }
@@ -109,5 +109,8 @@ main () {
 
 	cleanup
 }
+
+SRCDIR="$(dirname $0)"
+DSTDIR="$SRCDIR/ca"
 
 main "${1}"
