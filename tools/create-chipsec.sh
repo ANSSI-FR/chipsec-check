@@ -167,6 +167,8 @@ install_debian () {
 		do_chroot apt -y install "${extra_packages}"
 	fi
 
+	do_chroot apt clean
+
 	echo chipsec > ${mount_point}/etc/hostname
   
 	echo "$(lsblk -n -o UUID -P ${root})         /         ext4      defaults      1      1" > "${mount_point}"/etc/fstab
