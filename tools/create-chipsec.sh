@@ -112,19 +112,28 @@ exit_if_no () {
 part_disk () {
 	local disk=${1}
 
-	parted "${1}" --script mklabel gpt
-	parted "${1}" --script mkpart ESP fat32 1MiB 100MiB
-	parted "${1}" --script set 1 boot on
-	parted "${1}" --script mkpart primary ext4 100MiB 100%
+	parted "${1}" --script --align optimal \
+		mklabel gpt \
+		mkpart data fat32 1MiB 100MiB \
+		mkpart esp  fat32 100MiB 200MiB \
+		set 2 boot on \
+		set 2 esp on \
+		mkpart chipsec ext4 200MiB 100%
 }
 
 format_boot () {
 	local boot=${1}
 
 	sleep 1
-	mkfs.vfat ${boot}
+	mkfs.vfat -n ESP ${boot}
 }
 
+format_data() {
+	local data=${1}
+
+	sleep 1
+	mkfs.vfat -n DATA ${data}
+}
 
 format_root () {
 	local root=${1}
@@ -278,14 +287,17 @@ main () {
 
 	part_disk "${disk}"
 
-	boot="${disk}${sep}1"
-	root="${disk}${sep}2"
+	data="${disk}${sep}1"
+	boot="${disk}${sep}2"
+	root="${disk}${sep}3"
 
 
 	echo "Using ${root} as root partition"
 	echo "Using ${boot} as boot partition"
+	echo "Using ${data} as data partition"
 	format_boot "${boot}"
 	format_root "${root}"
+	format_data "${data}"
 
 	mount_mnt "${boot}" "${root}"
 
