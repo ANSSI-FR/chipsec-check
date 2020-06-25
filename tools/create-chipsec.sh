@@ -158,6 +158,7 @@ do_chroot() {
 install_debian () {
 	local root="${1}"
 	local boot="${2}"
+	local data="${3}"
 
 	debootstrap stable "${mount_point}" https://deb.debian.org/debian/
 
@@ -182,6 +183,8 @@ install_debian () {
   
 	echo "$(lsblk -n -o UUID -P ${root})         /         ext4      defaults      1      1" > "${mount_point}"/etc/fstab
 	echo "$(lsblk -n -o UUID -P ${boot})         /boot     vfat      defaults      1      1" >> "${mount_point}"/etc/fstab
+	echo "$(lsblk -n -o UUID -P ${data})         /mnt/data vfat      defaults      1      1" >> "${mount_point}"/etc/fstab
+	mkdir "${mount_point}"/mnt/data
 
 	do_chroot update-grub
 	do_chroot grub-install --target=x86_64-efi --efi-directory /boot --no-nvram
@@ -305,7 +308,7 @@ main () {
 	install_shell
 	install_keytool
 
-	install_debian "${root}" "${boot}"
+	install_debian "${root}" "${boot}" "${data}"
 
 	install_chipsec
 
