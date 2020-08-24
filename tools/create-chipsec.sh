@@ -160,17 +160,17 @@ install_debian () {
 	local boot="${2}"
 	local data="${3}"
 
-	debootstrap stable "${mount_point}" https://deb.debian.org/debian/
+	debootstrap --variant=minbase stable "${mount_point}" https://deb.debian.org/debian/
 
 	mount proc "${mount_point}"/proc -t proc
 	mount sysfs "${mount_point}"/sys -t sysfs
 	mount -o bind /dev "${mount_point}"/dev
 
-	do_chroot apt -y install systemd linux-image-amd64 grub-efi
+	do_chroot apt -y install systemd linux-image-amd64 grub-efi iproute2
 	do_chroot apt -y install git build-essential linux-headers-amd64
 	do_chroot apt -y install python3 python3-dev python3-setuptools
 	do_chroot apt -y install sed nasm pciutils fwupd lshw usbutils
-	do_chroot apt -y install tpm2-tools
+	do_chroot apt -y install tpm2-tools cpuid msr-tools dmidecode
 
 	if [ -n "${extra_packages}" ];
 	then
