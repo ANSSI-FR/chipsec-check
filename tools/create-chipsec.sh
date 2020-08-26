@@ -60,6 +60,7 @@ sign_shim_boot () {
 }
 
 sign_kernel () {
+	set -x
 	local KERNEL="${mount_point}/boot/vmlinuz*"
 
 	sbsign --key "$keypath"/DB.key --cert "$keypath"/DB.crt --output ${KERNEL} ${KERNEL}
@@ -68,6 +69,8 @@ sign_kernel () {
 	"${mount_point}"/usr/lib/linux-kbuild-4.19/scripts/sign-file \
 		sha256 "$keypath"/DB.key "$keypath"/DB.crt \
 		"${mount_point}"/usr/local/lib/python*/dist-packages/chipsec-*/chipsec/helper/linux/chipsec.ko
+
+	set +x
 }
 
 
@@ -205,6 +208,8 @@ install_shell () {
 
 	mkdir -p ${EFI%/*}
 	sbsign --key "$keypath"/DB.key --cert "$keypath"/DB.crt --output "${EFI}" "$SRCDIR/bin/Shell.efi"
+
+	# Configure EFI boot entry
 	echo "Shell.efi,shell,,Start the UEFI shell" |iconv -t UCS-2 > ${CFG}
 }
 
@@ -217,6 +222,8 @@ install_keytool () {
 	sbsign --key "$keypath"/DB.key --cert "$keypath"/DB.crt --output "${KEFI}" /usr/lib/efitools/x86_64-linux-gnu/KeyTool.efi
 
 	cp /usr/lib/efitools/x86_64-linux-gnu/HashTool.efi "${HEFI}"
+
+	# Configure EFI boot entry
 	echo "KeyTool.efi,keytool,,Start Secureboot keys management tool" |iconv -t UCS-2 > ${CFG}
 }
 
@@ -324,6 +331,10 @@ main () {
 	sign_kernel
 
 	echo -e "\n\nChipsec key built on $(date -R)" >> "${mount_point}"/etc/motd
+
+	# Configure Grub boot entries
+	echo "menuentry 'EFI Shell' { chainloader /EFI/Boot/Shell.efi }" >> ${mount_point}/boot/grub/custom.cfg
+	echo "menuentry 'Keytool' { chainloader /EFI/keytool/KeyTool.efi }" >> ${mount_point}/boot/grub/custom.cfg
 
 	umount_debian
 
