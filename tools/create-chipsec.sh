@@ -60,7 +60,6 @@ sign_shim_boot () {
 }
 
 sign_kernel () {
-	set -x
 	local KERNEL="${mount_point}/boot/vmlinuz*"
 
 	sbsign --key "$keypath"/DB.key --cert "$keypath"/DB.crt --output ${KERNEL} ${KERNEL}
@@ -70,7 +69,6 @@ sign_kernel () {
 		sha256 "$keypath"/DB.key "$keypath"/DB.crt \
 		"${mount_point}"/usr/local/lib/python*/dist-packages/chipsec-*/chipsec/helper/linux/chipsec.ko
 
-	set +x
 }
 
 
