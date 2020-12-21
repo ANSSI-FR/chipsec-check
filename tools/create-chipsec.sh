@@ -49,14 +49,10 @@ sign_grub () {
 sign_shim_boot () {
 	local SHIM="${mount_point}/boot/EFI/debian/shimx64.efi"
 	local BOOT="${mount_point}/boot/EFI/Boot/bootx64.efi"
-	# Fallback binary with bootx64.csv config file
 	local FB="${mount_point}/boot/EFI/debian/fbx64.efi"
-	local CFG="${mount_point}/boot/EFI/debian/BOOTX64.csv"
 
 	sbsign --key "$keypath"/DB.key --cert "$keypath"/DB.crt --output ${SHIM} ${SHIM}
 	sbsign --key "$keypath"/DB.key --cert "$keypath"/DB.crt --output ${BOOT} ${FB}
-
-	echo "shimx64.efi,chipsec,,Start Chipsec Debian distribution" |iconv -t UCS-2 > ${CFG}
 }
 
 sign_kernel () {
@@ -202,27 +198,19 @@ install_ca () {
 
 install_shell () {
 	local EFI="${mount_point}/boot/EFI/Boot/Shell.efi"
-	local CFG="${mount_point}/boot/EFI/Boot/BOOTX64.csv"
 
 	mkdir -p ${EFI%/*}
 	sbsign --key "$keypath"/DB.key --cert "$keypath"/DB.crt --output "${EFI}" "$SRCDIR/bin/Shell.efi"
-
-	# Configure EFI boot entry
-	echo "Shell.efi,shell,,Start the UEFI shell" |iconv -t UCS-2 > ${CFG}
 }
 
 install_keytool () {
 	local KEFI="${mount_point}/boot/EFI/keytool/KeyTool.EFI"
 	local HEFI="${mount_point}/boot/EFI/keytool/HelloWorld.EFI"
-	local CFG="${mount_point}/boot/EFI/keytool/BOOTX64.csv"
 
 	mkdir -p ${KEFI%/*}
 	sbsign --key "$keypath"/DB.key --cert "$keypath"/DB.crt --output "${KEFI}" /usr/lib/efitools/x86_64-linux-gnu/KeyTool.efi
 
 	cp /usr/lib/efitools/x86_64-linux-gnu/HashTool.efi "${HEFI}"
-
-	# Configure EFI boot entry
-	echo "KeyTool.efi,keytool,,Start Secureboot keys management tool" |iconv -t UCS-2 > ${CFG}
 }
 
 
