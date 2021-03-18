@@ -27,11 +27,12 @@ EOF
 }
 
 install_chipsec () {
+	local repo=${repository:-https://github.com/chipsec/chipsec}
 	if [ -n "$commit" ];
 	then
-		do_chroot git clone -b $commit https://github.com/chipsec/chipsec /root/chipsec
+		do_chroot git clone -b $commit ${repo} /root/chipsec
 	else
-		do_chroot git clone https://github.com/chipsec/chipsec /root/chipsec
+		do_chroot git clone ${repo} /root/chipsec
 	fi
 
 	mkdir -p "${mount_point}"/root
@@ -230,7 +231,7 @@ cleanup() {
 }
 
 main () {
-	while getopts "c:d:e:k:" opt; do
+	while getopts "c:d:e:k:r:" opt; do
 		case $opt in
 			c)
 				echo "Chipsec commit: ${OPTARG}"
@@ -247,6 +248,10 @@ main () {
 			k)
 				echo "Path to keys: ${OPTARG}"
 				keypath="${OPTARG}"
+				;;
+			r)
+				echo "Using repository ${OPTARG} for Chipsec"
+				repository="${OPTARG}"
 				;;
 			*)
 				usage
