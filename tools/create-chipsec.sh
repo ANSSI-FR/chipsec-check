@@ -50,10 +50,8 @@ sign_grub () {
 sign_shim_boot () {
 	local SHIM="${mount_point}/boot/EFI/debian/shimx64.efi"
 	local BOOT="${mount_point}/boot/EFI/Boot/bootx64.efi"
-	local FB="${mount_point}/boot/EFI/debian/fbx64.efi"
 
-	sbsign --key "$keypath"/DB.key --cert "$keypath"/DB.crt --output ${SHIM} ${SHIM}
-	sbsign --key "$keypath"/DB.key --cert "$keypath"/DB.crt --output ${BOOT} ${FB}
+	sbsign --key "$keypath"/DB.key --cert "$keypath"/DB.crt --output ${BOOT} ${SHIM}
 }
 
 sign_kernel () {
