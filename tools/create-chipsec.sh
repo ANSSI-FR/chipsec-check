@@ -188,6 +188,7 @@ install_debian () {
 	do_chroot grub-install --target=x86_64-efi --efi-directory /boot --no-nvram
 	do_chroot mkdir -p /boot/EFI/Boot
 	do_chroot grub-mkconfig -o /boot/grub/grub.cfg
+	do_chroot rm /boot/EFI/debian/BOOTX64.CSV
 
 	do_chroot passwd -d root
 }
