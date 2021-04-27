@@ -44,6 +44,8 @@ install_chipsec () {
 
 sign_grub () {
 	local GRUB="${mount_point}/boot/EFI/debian/grubx64.efi"
+	local BOOT="${mount_point}/boot/EFI/Boot/grubx64.efi"
+	sbsign --key "$keypath"/DB.key --cert "$keypath"/DB.crt --output ${BOOT} ${GRUB}
 	sbsign --key "$keypath"/DB.key --cert "$keypath"/DB.crt --output ${GRUB} ${GRUB}
 }
 
