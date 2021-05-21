@@ -1,5 +1,5 @@
 #!/bin/bash
-set -e
+set -eE
 
 usage () {
   cat <<EOF
@@ -225,7 +225,7 @@ umount_debian () {
 }
 
 cleanup() {
-	set +e
+	set +E
 	echo "Error in processus, cleaning up" >&2
 	umount_debian
 	losetup -d ${disk} 2>/dev/null
