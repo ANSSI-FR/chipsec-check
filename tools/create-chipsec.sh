@@ -110,33 +110,31 @@ exit_if_no () {
 part_disk () {
 	local disk=${1}
 
-	parted "${1}" --script --align optimal \
-		mklabel gpt \
-		mkpart data fat32 1MiB 100MiB \
-		mkpart esp  fat32 100MiB 200MiB \
-		set 2 boot on \
-		set 2 esp on \
-		mkpart chipsec ext4 200MiB 100%
+	sfdisk -q "${disk}" << EOF
+label: gpt
+size=100MiB,type=uefi,name=esp,bootable
+size=1.6GiB,type=linux,name=chipsec
+type=EBD0A0A2-B9E5-4433-87C0-68B6B72699C7,name=data
+EOF
+
+	partprobe "${disk}"
 }
 
 format_boot () {
 	local boot=${1}
 
-	sleep 1
 	mkfs.vfat -n ESP ${boot}
 }
 
 format_data() {
 	local data=${1}
 
-	sleep 1
 	mkfs.vfat -n DATA ${data}
 }
 
 format_root () {
 	local root=${1}
 
-	sleep 1
 	mkfs.ext4 -F ${root}
 }
 
@@ -289,9 +287,9 @@ main () {
 
 	part_disk "${disk}"
 
-	data="${disk}${sep}1"
-	boot="${disk}${sep}2"
-	root="${disk}${sep}3"
+	boot="${disk}${sep}1"
+	root="${disk}${sep}2"
+	data="${disk}${sep}3"
 
 
 	echo "Using ${root} as root partition"
