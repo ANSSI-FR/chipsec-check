@@ -31,39 +31,38 @@ mkdir -p $DSTDIR
 cd $DSTDIR
 rm -f *.cer *.crt *.key *.esl *.auth myGUID.txt
 
-openssl req -new -x509 -newkey rsa:2048 -subj "/CN=$NAME PK/" -keyout PK.key \
-        -out PK.crt -days 3650 -nodes -sha256
-openssl req -new -x509 -newkey rsa:2048 -subj "/CN=$NAME KEK/" -keyout KEK.key \
-        -out KEK.crt -days 3650 -nodes -sha256
-openssl req -new -x509 -newkey rsa:2048 -subj "/CN=$NAME DB/" -keyout DB.key \
-        -out DB.crt -days 3650 -nodes -sha256
-openssl req -new -x509 -newkey rsa:2048 -subj "/CN=$NAME DBX/" -keyout DBX.key \
-        -out DBX.crt -days 3650 -nodes -sha256
-openssl x509 -in PK.crt -out PK.cer -outform DER
-openssl x509 -in KEK.crt -out KEK.cer -outform DER
-openssl x509 -in DB.crt -out DB.cer -outform DER
-openssl x509 -in DBX.crt -out DBX.cer -outform DER
-
 GUID=$(uuid)
 echo $GUID > myGUID.txt
 
-cert-to-efi-sig-list -g $GUID PK.crt PK.esl
-cert-to-efi-sig-list -g $GUID KEK.crt KEK.esl
-cert-to-efi-sig-list -g $GUID DB.crt DB.esl
-cert-to-efi-sig-list -g $GUID DBX.crt DBX.esl
+for key in PK KEK DB DBX;
+do
+	openssl req -new -x509 -newkey rsa:2048 -subj "/CN=$NAME ${key}/" -keyout ${key}.key \
+        -out ${key}.crt -days 3650 -nodes -sha256
+
+	openssl x509 -in ${key}.crt -out ${key}.cer -outform DER
+
+	cert-to-efi-sig-list -g $GUID ${key}.crt ${key}.esl
+done
+
 rm -f noPK.esl
 touch noPK.esl
 
-sign-efi-sig-list -t "$(date --date='1 second' +'%Y-%m-%d %H:%M:%S')" \
-                  -k PK.key -c PK.crt PK PK.esl PK.auth
-sign-efi-sig-list -t "$(date --date='1 second' +'%Y-%m-%d %H:%M:%S')" \
-                  -k PK.key -c PK.crt PK noPK.esl noPK.auth
-sign-efi-sig-list -t "$(date --date='1 second' +'%Y-%m-%d %H:%M:%S')"\
-                  -k PK.key -c PK.crt KEK KEK.esl KEK.auth
-sign-efi-sig-list -t "$(date --date='1 second' +'%Y-%m-%d %H:%M:%S')"\
-                  -k KEK.key -c KEK.crt db DB.esl DB.auth
-sign-efi-sig-list -t "$(date --date='1 second' +'%Y-%m-%d %H:%M:%S')"\
-                  -k KEK.key -c KEK.crt dbx DBX.esl DBX.auth
+for key in PK noPK KEK DB DBX;
+do
+	case $key in
+		"noPK")
+			var="PK";;
+		"DB")
+			var="db";;
+		"DBX")
+			var="dbx";;
+		*)
+			var="${key}";;
+	esac
+
+	sign-efi-sig-list -t "$(date --date='1 second' +'%Y-%m-%d %H:%M:%S')" \
+  	-k PK.key -c PK.crt ${var} ${key}.esl ${key}.auth
+done
 
 chmod 0600 *.key
 
