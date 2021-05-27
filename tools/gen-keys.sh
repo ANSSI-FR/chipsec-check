@@ -37,9 +37,12 @@ openssl req -new -x509 -newkey rsa:2048 -subj "/CN=$NAME KEK/" -keyout KEK.key \
         -out KEK.crt -days 3650 -nodes -sha256
 openssl req -new -x509 -newkey rsa:2048 -subj "/CN=$NAME DB/" -keyout DB.key \
         -out DB.crt -days 3650 -nodes -sha256
+openssl req -new -x509 -newkey rsa:2048 -subj "/CN=$NAME DBX/" -keyout DBX.key \
+        -out DBX.crt -days 3650 -nodes -sha256
 openssl x509 -in PK.crt -out PK.cer -outform DER
 openssl x509 -in KEK.crt -out KEK.cer -outform DER
 openssl x509 -in DB.crt -out DB.cer -outform DER
+openssl x509 -in DBX.crt -out DBX.cer -outform DER
 
 GUID=$(uuid)
 echo $GUID > myGUID.txt
@@ -47,6 +50,7 @@ echo $GUID > myGUID.txt
 cert-to-efi-sig-list -g $GUID PK.crt PK.esl
 cert-to-efi-sig-list -g $GUID KEK.crt KEK.esl
 cert-to-efi-sig-list -g $GUID DB.crt DB.esl
+cert-to-efi-sig-list -g $GUID DBX.crt DBX.esl
 rm -f noPK.esl
 touch noPK.esl
 
@@ -57,7 +61,9 @@ sign-efi-sig-list -t "$(date --date='1 second' +'%Y-%m-%d %H:%M:%S')" \
 sign-efi-sig-list -t "$(date --date='1 second' +'%Y-%m-%d %H:%M:%S')"\
                   -k PK.key -c PK.crt KEK KEK.esl KEK.auth
 sign-efi-sig-list -t "$(date --date='1 second' +'%Y-%m-%d %H:%M:%S')"\
-       		  -k KEK.key -c KEK.crt db DB.esl DB.auth
+                  -k KEK.key -c KEK.crt db DB.esl DB.auth
+sign-efi-sig-list -t "$(date --date='1 second' +'%Y-%m-%d %H:%M:%S')"\
+                  -k KEK.key -c KEK.crt dbx DBX.esl DBX.auth
 
 chmod 0600 *.key
 
