@@ -1,4 +1,5 @@
 #!/bin/bash
+# vim: noexpandtab:
 set -eE
 
 usage () {
@@ -7,15 +8,18 @@ NAME
 	${0} - create a minimal linux system with ChipSec
 
 SYNOPSIS
-	${0} -d DISK [-c <commit>] [-e "EXTRA PACKAGES"] [ -k "Path to keys folder" ]
+	${0} -d DISK [-r <repository] [-c <commit>] [-e "EXTRA PACKAGES"] [ -k "Path to keys folder" ]
 
 DESCRIPTION
 	Create a minimal linux system (with Chipsec installed) on DISK. DISK
 	can be a block device or a file which can then be copied to a disk.
 	The content of DISK is wiped by doing so, so be careful when using this tool.
 
-	<commit> is the optional Chipsec commit ID or tag which will be cloned to
-	DISK. If absent, master is used.
+	<repository> is the optional Chipsec git repository which will be cloned to
+	DISK. If absent, official upstream from github is used.
+
+	<commit> is the optional Chipsec commit ID or tag which will be checked out.
+	If absent, master is used.
 
 	"EXTRA_PACKAGES" is a quoted, space separated list of extra packages to
 	install on the minimal Linux system.

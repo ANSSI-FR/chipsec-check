@@ -11,7 +11,8 @@ document](https://www.ssi.gouv.fr/en/guide/hardware-security-requirements-for-x8
 (in [French](https://www.ssi.gouv.fr/guide/exigences-de-securite-materielles/)
 as well)
 
-Provided tools can be used to build two bootable USB keys:
+Provided tools can be used to build a bootable USB key. This key can boot in
+the following modes:
 
 - the first around the [chipsec](https://github.com/chipsec/chipsec) tool
 	edited by Intel, integrated in a Debian live distribution, which can be used
