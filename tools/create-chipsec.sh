@@ -232,14 +232,23 @@ umount_debian () {
 	umount "${mount_point}"
 }
 
-cleanup() {
+cleanup () {
+	umount_debian
+	rmdir ${mount_point}
+	if [ ! -b "$arg" ];
+	then
+		losetup -d ${disk}
+	fi
+}
+
+trap_cleanup () {
 	set +E
 	echo "Error in processus, cleaning up" >&2
-	umount_debian
-	losetup -d ${disk} 2>/dev/null
+	cleanup
 }
 
 main () {
+	trap trap_cleanup ERR
 	while getopts "c:d:e:k:r:" opt; do
 		case $opt in
 			c)
@@ -272,8 +281,6 @@ main () {
 		usage
 		exit 1
 	fi
-	trap cleanup ERR
-
 
 	printf "Use ${arg}? It will be completely erased (Y/n) "
 	exit_if_no "$(ask_confirm "Y")"
@@ -336,14 +343,7 @@ main () {
 	echo "menuentry 'EFI Shell' { chainloader /EFI/Boot/Shell.efi }" >> ${mount_point}/boot/grub/custom.cfg
 	echo "menuentry 'Keytool' { chainloader /EFI/keytool/KeyTool.efi }" >> ${mount_point}/boot/grub/custom.cfg
 
-	umount_debian
-
-	rmdir ${mount_point}
-
-	if [ ! -b "$arg" ];
-	then
-		losetup -d $disk
-	fi
+	cleanup
 }
 
 SRCDIR="$(dirname $0)"
