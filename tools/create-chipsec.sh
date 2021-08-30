@@ -26,6 +26,36 @@ DESCRIPTION
 EOF
 }
 
+check_requirements() {
+	local ret=0
+	if [ ! -x /sbin/mkfs.vfat ];
+	then
+		echo "mkfs.vfat not found, please install the dosfstools package" >&2
+		ret=1
+	fi
+	if [ ! -x /usr/bin/sbsign ];
+	then
+		echo "sbsign not found, please install the sbsigntool package" >&2
+		ret=1
+	fi
+	if [ ! -f /usr/lib/efitools/x86_64-linux-gnu/KeyTool.efi ];
+	then
+		echo "KeyTool.efi not found, please install the efitools package" >&2
+		ret=1
+	fi
+	if [ ! -f /usr/lib/efitools/x86_64-linux-gnu/HashTool.efi ];
+	then
+		echo "HashTool.efi not found, please install the efitools package" >&2
+		ret=1
+	fi
+	if [ $(id -u) != 0 ];
+	then
+		echo "Please run as root or through sudo to create partitions on the target USB key" >&2
+		ret=1
+	fi
+	return $ret
+}
+
 install_chipsec () {
 	local repo=${repository:-https://github.com/chipsec/chipsec}
 	if [ -n "$commit" ];
@@ -248,6 +278,7 @@ trap_cleanup () {
 }
 
 main () {
+	check_requirements || exit 1
 	trap trap_cleanup ERR
 	while getopts "c:d:e:k:r:" opt; do
 		case $opt in
