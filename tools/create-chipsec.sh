@@ -165,8 +165,12 @@ install_debian () {
 	do_chroot apt -y install systemd linux-image-amd64 grub-efi iproute2
 	do_chroot apt -y install git build-essential linux-headers-amd64
 	do_chroot apt -y install python3 python3-dev python3-setuptools
-	do_chroot apt -y install sed nasm pciutils fwupd lshw usbutils
+	do_chroot apt -y install vim sed nasm pciutils fwupd lshw usbutils
 	do_chroot apt -y install tpm2-tools cpuid msr-tools dmidecode
+	# Skip dpkg question about console-data configuration, we only care
+	# about having a database for loadkeys.
+	do_chroot sh -c "echo 'console-common	console-data/keymap/policy	select	Keep kernel keymap' | debconf-set-selections"
+	do_chroot apt -y install kbd console-data
 
 	if [ -n "${extra_packages}" ];
 	then
