@@ -1,52 +1,45 @@
-<h1 id="usb-key-building-for-chipsec-and-secureboot-checks-v0.1-042019">USB KEY BUILDING FOR CHIPSEC AND SECUREBOOT CHECKS v0.1 (04/2019)</h1>
+<h1 id="usb-key-building-for-chipsec-and-secureboot-checks">USB key building for chipsec and secureboot checks</h1>
 <pre><code>A Help to build your own ChipSec and SecureBoot USB keys</code></pre>
-<h2 id="final-usb-keys">Final USB keys</h2>
-<ul>
-<li><strong>USB KEY 1</strong> : live Debian distribution to launch <strong>ChipSec</strong> from the computer to analyze</li>
-<li><strong>USB KEY 2</strong> : contains <strong>SecureBoot</strong> keys to import, tool to import your own trust keys and to check importation</li>
-</ul>
+<p>The created USB key can boot in either of the following modes:</p>
+<ol type="1">
+<li>a live Debian distribution to launch <strong>ChipSec</strong> on the computer to analyze</li>
+<li>a tool to import your own trust keys and to check importation, as well as <strong>SecureBoot</strong> keys to import,</li>
+</ol>
 <h2 id="linux-tools-to-install-before-generating-the-usb-keys">Linux Tools to install before generating the USB keys</h2>
 <pre><code>    sudo apt-get install debootstrap
     sudo apt-get install sbsigntool
     sudo apt-get install efitools</code></pre>
-<h2 id="tool-to-build-the-usb-keys-create-keys.sh">Tool to build the usb keys : create-keys.sh</h2>
+<h2 id="tool-to-build-the-usb-key-create-chipsec.sh">Tool to build the USB key: create-chipsec.sh</h2>
 <blockquote>
 <p><strong>Note:</strong> Some sub scripts require access to sudo commands.</p>
 </blockquote>
-<h3 id="build-usb-key-1">Build USB KEY 1</h3>
-<p>Plug a new usb key (attached on /dev/sdc in this case).</p>
-<pre><code>./create-keys.sh live /dev/sdc</code></pre>
-<p>Unplug the usb key.</p>
-<h3 id="build-usb-key-2">Build USB KEY 2</h3>
-<p>Plug a new usb key (attached on /dev/sdc in this case).</p>
-<pre><code>./create-keys.sh shell /dev/sdc</code></pre>
-<p>Unplug the usb key.</p>
-<h2 id="boot-on-keys">Boot on keys</h2>
-<p>Plug one of keys, start the computer.</p>
-<h3 id="usb-key-1">USB KEY 1</h3>
+<p>The script supports writing to a block device (<code>/dev/sdc</code> for example) or a standard file, which can be later copied to a USB drive using <code>dd</code>.</p>
+<p>Plug a new USB key (attached on /dev/sdc in this case).</p>
+<pre><code>./create-chipsec.sh /dev/sdc</code></pre>
+<p>Unplug the USB key.</p>
+<h2 id="test-the-system">Test the system</h2>
+<p>Plug the key, start the computer and pick one of the two boot modes.</p>
+<h3 id="live-debian-distribution">Live Debian distribution</h3>
 <ol type="1">
-<li>boot on the USB key, then at the bootloader prompt start linux live</li>
+<li>boot on the USB key, then at the bootloader prompt start “Debian GUN/Linux”</li>
 <li>when finished booting, login as root (no password)</li>
-<li>from the root terminal, launch ChipSec with “chipsec_main.py”.</li>
+<li>if you need an alternate keyboard, use eg. <code>loadkeys fr</code>.</li>
+<li>from the root terminal, launch ChipSec with <code>chipsec_main.py</code>.</li>
+<li>alternately you can run the dump_system.sh script which will also gather information about the machine (hardware present, firmware versions et.c)</li>
 </ol>
-<h3 id="usb-key-2">USB KEY 2 :</h3>
+<h3 id="efi-tool">EFI Tool</h3>
 <ol type="1">
 <li>Go the BIOS/Firmware configuration and set the platform to SecureBoot enabled and reset to Setup Mode.</li>
-<li>either:
+<li>Boot on USB key, then at the bootloader prompt either:
 <ul>
-<li>boot on USB key and launch EFI binaries from EFI shell (Shell.efi is automaticaly started).</li>
-<li>OR interrupt the normal boot to select a shell EFI from boot configuration and launch EFI binaries from EFI shell.</li>
+<li>start “Keytool” directly, which lets you execute binaries from its menu,</li>
+<li>OR start “EFI Shell” and launch EFI binaries from EFI shell (eg. launch <code>EFI/keytool/KeyTool.efi</code> to import trust keys).</li>
 </ul></li>
-<li>execute binaries from EFI shell :
+<li>From the EFI shell, you can identify the USB key letter storing the binaries with commmands “fs0:” or “fs1:” or fsX: … then “dir”. Within Keytool, the drives will have names instead. The USB key should be named “ESP”, but you can confirm it by browsing its content through the “Execute Binary” menu.</li>
+<li>With Keytool, import the following files from the <code>EFI/keys</code> folder (in that order): <code>DBX.esl</code>, <code>DB.esl</code>, <code>KEK.esl</code> and <code>PK.auth</code>. Importing the PK will set the platform to User mode.</li>
+<li>Restart the platform:
 <ul>
-<li>identify the USB key letter storing the binaries with commmands “fs0” or “fs1” or fsX … then “dir”</li>
-<li>launch “KeyTool.efi” to import trust keys.</li>
-</ul></li>
-<li>replace (in that order) db, KEK and PK using files from keytool folder</li>
-<li>importing the PK will set the platform to User mode</li>
-<li>restart the platform:
-<ul>
-<li>the shell should run since it’s signed with trust anchor to the PK</li>
-<li>HelloWorld.efi should not run since it’s unsigned</li>
+<li>the shell should run since it’s signed with trust anchor to the PK;</li>
+<li><code>HelloWorld.efi</code> should not run since it’s unsigned.</li>
 </ul></li>
 </ol>

@@ -1,26 +1,27 @@
 PANDOC = pandoc -f markdown
 
 SRC = $(wildcard *.md)
-PDF = $(SRC:.md=.pdf)
-TEX = $(SRC:.md=.tex)
-HTM = $(SRC:.md=.htm)
+PDF = $(addprefix output/, $(SRC:.md=.pdf))
+TEX = $(addprefix output/, $(SRC:.md=.tex))
+HTM = $(addprefix output/, $(SRC:.md=.htm))
 
-# only build PDF by default
+default: pdf htm
+
+all: pdf tex htm
+
 pdf: $(PDF)
 
 tex: $(TEX)
 
 htm: $(HTM)
 
-all: pdf tex htm
-
-%.tex: %.md
+output/%.tex: %.md
 	$(PANDOC) $< -o $@ 
 
-%.pdf: %.md
+output/%.pdf: %.md
 	$(PANDOC) $< -o $@ 
 
-%.htm: %.md
+output/%.htm: %.md
 	$(PANDOC) $< -o $@ 
 
 clean:
