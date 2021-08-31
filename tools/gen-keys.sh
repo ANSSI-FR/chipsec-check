@@ -12,7 +12,7 @@ NAME="chipsec-sec secureboot test"
 if [ -x /usr/bin/dpkg ];
 then
 	efitools_vers=$(sign-efi-sig-list --version | awk '{ print $2 }')
-	if $(dpkg --compare-versions "$efitools_vers" lt "1.9.2");
+	if dpkg --compare-versions "$efitools_vers" lt "1.9.2";
 	then
 		echo "efitools version ($efitools_vers) is too old, please upgrade to efitools >= 1.9.2 to avoid potential bugs when inserting PK" >&2
 		exit 1
@@ -25,14 +25,14 @@ then
 	exit 1
 fi
 
-SRCDIR="$(dirname $0)"
+SRCDIR="$(dirname "$0")"
 DSTDIR="$SRCDIR/ca"
-mkdir -p $DSTDIR
-cd $DSTDIR
-rm -f *.cer *.crt *.key *.esl *.auth myGUID.txt
+mkdir -p "$DSTDIR"
+cd "$DSTDIR"
+rm -f -- *.cer *.crt *.key *.esl *.auth myGUID.txt
 
 GUID=$(uuid)
-echo $GUID > myGUID.txt
+echo "$GUID" > myGUID.txt
 
 for key in PK KEK DB DBX;
 do
@@ -41,7 +41,7 @@ do
 
 	openssl x509 -in ${key}.crt -out ${key}.cer -outform DER
 
-	cert-to-efi-sig-list -g $GUID ${key}.crt ${key}.esl
+	cert-to-efi-sig-list -g "$GUID" ${key}.crt ${key}.esl
 done
 
 rm -f noPK.esl
@@ -64,7 +64,7 @@ do
   	-k PK.key -c PK.crt ${var} ${key}.esl ${key}.auth
 done
 
-chmod 0600 *.key
+chmod 0600 -- *.key
 
 echo ""
 echo ""
