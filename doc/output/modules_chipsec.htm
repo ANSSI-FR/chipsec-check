@@ -343,8 +343,9 @@ HSFS = 0xE008 &lt;&lt; Hardware Sequencing Flash Status Register (SPIBAR + 0x4)
 <p>This module common.bios_wp will fail if SMM-based protection is not correctly configured and SPI protected ranges (PR registers) do not protect the entire BIOS region.</p>
 <h3 id="technical-informations-12">Technical informations</h3>
 <ul>
-<li>BIOSWE allow to lock writing on Flash SPI Region, BLE to control (SMI interruption) modifications on bit BIOSWE, SMM_BWP prevent writing from kernel space.</li>
-<li>PR0&lt;=&gt;Desc BIOS Region, PR1&lt;=&gt;BIOS Region, PR2&lt;=&gt;ME Region, PR3&lt;=&gt;GbE Region, PR4&lt;=&gt;PDR Region</li>
+<li>Bits of BIOS_CNTL register : BIOSWE allows to lock writing on Flash SPI Region, BLE to control (SMI interruption) modifications on bit BIOSWE, SMM_BWP to prevent writing from kernel space.</li>
+<li>5 PR Registers : PR0&lt;=&gt;Desc BIOS Region, PR1&lt;=&gt;BIOS Region, PR2&lt;=&gt;ME Region, PR3&lt;=&gt;GbE Region, PR4&lt;=&gt;PDR Region</li>
+<li>WP bit of PR Registers protects against modification of BIOS Flash Region.</li>
 </ul>
 <h3 id="valid-output-13">Valid output</h3>
 <pre><code>[x][ Module: BIOS Region Write Protection
@@ -380,7 +381,7 @@ HSFS = 0xE008 &lt;&lt; Hardware Sequencing Flash Status Register (SPIBAR + 0x4)
 <li>SMI_LOCK bit of GEN_PMCON_1 register allows to lock configuration of SMI_EN register.</li>
 <li>TCO_LOCK bit of TCO1_CNT register allows to lock modification of SMI_EN[TCO_EN].</li>
 </ul></li>
-<li>The acronym TCO (Total Cost of Ownership) refer to a logic block in the Intel ICH products family.</li>
+<li><p>The acronym TCO (Total Cost of Ownership) refer to a logic block in the Intel ICH products family.</p></li>
 <li><p>If the SMI configuration space is not locked in writing, these events can be modified or deleted to allow a modification of register BIOS_CNTL.</p></li>
 </ul>
 <h3 id="exploitation-of-misconfiguration-secureboot-by-pass">Exploitation of misconfiguration (SecureBoot by pass)</h3>
