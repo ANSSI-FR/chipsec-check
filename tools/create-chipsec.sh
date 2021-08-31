@@ -30,7 +30,7 @@ DESCRIPTION
 EOF
 }
 
-check_requirements() {
+check_requirements () {
 	local ret=0
 	if [ ! -x /sbin/mkfs.vfat ];
 	then
@@ -52,7 +52,7 @@ check_requirements() {
 		echo "HashTool.efi not found, please install the efitools package" >&2
 		ret=1
 	fi
-	if [ $(id -u) != 0 ];
+	if [ "$(id -u)" != 0 ];
 	then
 		echo "Please run as root or through sudo to create partitions on the target USB key" >&2
 		ret=1
@@ -79,21 +79,22 @@ install_chipsec () {
 sign_grub () {
 	local GRUB="${mount_point}/boot/EFI/debian/grubx64.efi"
 	local BOOT="${mount_point}/boot/EFI/Boot/grubx64.efi"
-	sbsign --key "$keypath"/DB.key --cert "$keypath"/DB.crt --output ${BOOT} ${GRUB}
-	sbsign --key "$keypath"/DB.key --cert "$keypath"/DB.crt --output ${GRUB} ${GRUB}
+	sbsign --key "$keypath"/DB.key --cert "$keypath"/DB.crt --output "${BOOT}" "${GRUB}"
+	sbsign --key "$keypath"/DB.key --cert "$keypath"/DB.crt --output "${GRUB}" "${GRUB}"
 }
 
 sign_shim_boot () {
 	local SHIM="${mount_point}/boot/EFI/debian/shimx64.efi"
 	local BOOT="${mount_point}/boot/EFI/Boot/bootx64.efi"
 
-	sbsign --key "$keypath"/DB.key --cert "$keypath"/DB.crt --output ${BOOT} ${SHIM}
+	sbsign --key "$keypath"/DB.key --cert "$keypath"/DB.crt --output "${BOOT}" "${SHIM}"
 }
 
 sign_kernel () {
-	local KERNEL="${mount_point}/boot/vmlinuz*"
-
-	sbsign --key "$keypath"/DB.key --cert "$keypath"/DB.crt --output ${KERNEL} ${KERNEL}
+	for KERNEL in "${mount_point}"/boot/vmlinuz*;
+	do
+		sbsign --key "$keypath"/DB.key --cert "$keypath"/DB.crt --output "${KERNEL}" "${KERNEL}"
+	done
 
 	# Also sign the Chipsec module
 	local SIGNFILE=( "${mount_point}"/usr/lib/linux-kbuild-*/scripts/sign-file )
@@ -102,12 +103,6 @@ sign_kernel () {
 
 }
 
-
-get_partuuid () {
-	local disk="${1}"
-
-	echo $(blkid ${disk} | sed 's/.*PARTUUID="\(.*\)".*/\1/')
-}
 
 ask_confirm () {
 	local c=""
@@ -128,7 +123,7 @@ ask_confirm () {
 		;;
 	*)
 		printf "\nInvalid input, should be y(es) or n(o) "
-		ask_confirm ${default}
+		ask_confirm "${default}"
 		;;
 	esac
 }
@@ -161,10 +156,10 @@ EOF
 format_boot () {
 	local boot=${1}
 
-	mkfs.vfat -n ESP ${boot}
+	mkfs.vfat -n ESP "${boot}"
 }
 
-format_data() {
+format_data () {
 	local data=${1}
 
 	# Ensure FAT32 to allow partition resizing if a 2GB image is copied to
@@ -175,20 +170,20 @@ format_data() {
 format_root () {
 	local root=${1}
 
-	mkfs.ext4 -F ${root}
+	mkfs.ext4 -F "${root}"
 }
 
 mount_mnt () {
 	local boot="${1}"
 	local root="${2}"
 
-	mount ${root} "${mount_point}"
+	mount "${root}" "${mount_point}"
 	mkdir -p "${mount_point}"/boot
-	mount ${boot} "${mount_point}"/boot
+	mount "${boot}" "${mount_point}"/boot
 }
 
-do_chroot() {
-	PATH="$PATH:/usr/sbin:/sbin:/bin" chroot "${mount_point}"/ $*
+do_chroot () {
+	PATH="$PATH:/usr/sbin:/sbin:/bin" chroot "${mount_point}"/ "$@"
 }
 
 install_debian () {
@@ -219,11 +214,11 @@ install_debian () {
 
 	do_chroot apt clean
 
-	echo chipsec > ${mount_point}/etc/hostname
+	echo chipsec > "${mount_point}"/etc/hostname
   
-	echo "$(lsblk -n -o UUID -P ${root})         /         ext4      defaults      1      1" > "${mount_point}"/etc/fstab
-	echo "$(lsblk -n -o UUID -P ${boot})         /boot     vfat      defaults      1      1" >> "${mount_point}"/etc/fstab
-	echo "$(lsblk -n -o UUID -P ${data})         /mnt/data vfat      defaults      1      1" >> "${mount_point}"/etc/fstab
+	echo "$(lsblk -n -o UUID -P "${root}")         /         ext4      defaults      1      1" > "${mount_point}"/etc/fstab
+	echo "$(lsblk -n -o UUID -P "${boot}")         /boot     vfat      defaults      1      1" >> "${mount_point}"/etc/fstab
+	echo "$(lsblk -n -o UUID -P "${data}")         /mnt/data vfat      defaults      1      1" >> "${mount_point}"/etc/fstab
 	mkdir "${mount_point}"/mnt/data
 
 	do_chroot update-grub
@@ -243,7 +238,7 @@ install_ca () {
 install_shell () {
 	local EFI="${mount_point}/boot/EFI/Boot/Shell.efi"
 
-	mkdir -p ${EFI%/*}
+	mkdir -p "${EFI%/*}"
 	sbsign --key "$keypath"/DB.key --cert "$keypath"/DB.crt --output "${EFI}" "$SRCDIR/bin/Shell.efi"
 }
 
@@ -251,7 +246,7 @@ install_keytool () {
 	local KEFI="${mount_point}/boot/EFI/keytool/KeyTool.EFI"
 	local HEFI="${mount_point}/boot/EFI/keytool/HelloWorld.EFI"
 
-	mkdir -p ${KEFI%/*}
+	mkdir -p "${KEFI%/*}"
 	sbsign --key "$keypath"/DB.key --cert "$keypath"/DB.crt --output "${KEFI}" /usr/lib/efitools/x86_64-linux-gnu/KeyTool.efi
 
 	cp /usr/lib/efitools/x86_64-linux-gnu/HashTool.efi "${HEFI}"
@@ -268,10 +263,10 @@ umount_debian () {
 
 cleanup () {
 	umount_debian
-	rmdir ${mount_point}
+	rmdir "${mount_point}"
 	if [ ! -b "$arg" ];
 	then
-		losetup -d ${disk}
+		losetup -d "${disk}"
 	fi
 }
 
@@ -317,7 +312,7 @@ main () {
 		exit 1
 	fi
 
-	printf "Use ${arg}? It will be completely erased (Y/n) "
+	printf "Use %s? It will be completely erased (Y/n) " "${arg}"
 	exit_if_no "$(ask_confirm "Y")"
 
 	if [ -b "${arg}" ]; #block device, just use it directly
@@ -325,7 +320,7 @@ main () {
 		disk=${arg}
 		sep=""
 	else
-		truncate -s 2GB ${arg}
+		truncate -s 2GB "${arg}"
 		disk=$(losetup --find --show "$arg")
 		sep="p"
 	fi
@@ -375,11 +370,11 @@ main () {
 	echo -e "\n\nChipsec key built on $(date -R)" >> "${mount_point}"/etc/motd
 
 	# Configure Grub boot entries
-	echo "menuentry 'EFI Shell' { chainloader /EFI/Boot/Shell.efi }" >> ${mount_point}/boot/grub/custom.cfg
-	echo "menuentry 'Keytool' { chainloader /EFI/keytool/KeyTool.efi }" >> ${mount_point}/boot/grub/custom.cfg
+	echo "menuentry 'EFI Shell' { chainloader /EFI/Boot/Shell.efi }" >> "${mount_point}"/boot/grub/custom.cfg
+	echo "menuentry 'Keytool' { chainloader /EFI/keytool/KeyTool.efi }" >> "${mount_point}"/boot/grub/custom.cfg
 
 	cleanup
 }
 
-SRCDIR="$(dirname $0)"
+SRCDIR="$(dirname "$0")"
 main "${@}"

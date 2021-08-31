@@ -16,7 +16,7 @@ lsusb > "${dir}/lsusb.txt"
 lspci -vvvnn > "${dir}/lspci.txt"
 dmidecode -u > "${dir}/dmidecode.txt"
 lscpu > "${dir}/lscpu.txt"
-dmesg | egrep -i 'iommu|amd-vi|vt-d' > "${dir}/iommu.txt"
+dmesg | grep -E -i 'iommu|amd-vi|vt-d' > "${dir}/iommu.txt"
 fwupdmgr get-devices > "${dir}/fwupd.txt"
 tpm2_getcap -c properties-fixed > "${dir}/tpm2.txt"
 
