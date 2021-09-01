@@ -62,8 +62,8 @@ sign_kernel () {
 	sbsign --key "$keypath"/DB.key --cert "$keypath"/DB.crt --output ${KERNEL} ${KERNEL}
 
 	# Also sign the Chipsec module
-	"${mount_point}"/usr/lib/linux-kbuild-4.19/scripts/sign-file \
-		sha256 "$keypath"/DB.key "$keypath"/DB.crt \
+	local SIGNFILE=( "${mount_point}"/usr/lib/linux-kbuild-*/scripts/sign-file )
+	${SIGNFILE[0]} sha256 "$keypath"/DB.key "$keypath"/DB.crt \
 		"${mount_point}"/usr/local/lib/python*/dist-packages/chipsec-*/chipsec/helper/linux/chipsec.ko
 
 }
