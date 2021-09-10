@@ -30,9 +30,9 @@ install_chipsec () {
 	local repo=${repository:-https://github.com/chipsec/chipsec}
 	if [ -n "$commit" ];
 	then
-		do_chroot git clone -b $commit ${repo} /root/chipsec
+		git clone -b "$commit" "${repo}" "${mount_point}/root/chipsec"
 	else
-		do_chroot git clone ${repo} /root/chipsec
+		git clone "${repo}" "${mount_point}/root/chipsec"
 	fi
 
 	mkdir -p "${mount_point}"/root
@@ -163,9 +163,9 @@ install_debian () {
 	mount -o bind /dev "${mount_point}"/dev
 
 	do_chroot apt -y install systemd linux-image-amd64 grub-efi iproute2
-	do_chroot apt -y install git build-essential linux-headers-amd64
+	do_chroot apt -y install build-essential linux-headers-amd64
 	do_chroot apt -y install python3 python3-dev python3-setuptools
-	do_chroot apt -y install vim sed nasm pciutils fwupd lshw usbutils
+	do_chroot apt -y install vim-tiny sed nasm pciutils fwupd lshw usbutils
 	do_chroot apt -y install tpm2-tools cpuid msr-tools dmidecode
 	# Skip dpkg question about console-data configuration, we only care
 	# about having a database for loadkeys.
