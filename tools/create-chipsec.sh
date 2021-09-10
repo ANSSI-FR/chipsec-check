@@ -113,11 +113,15 @@ part_disk () {
 	sfdisk -q "${disk}" << EOF
 label: gpt
 size=100MiB,type=uefi,name=esp,bootable
-size=1.6GiB,type=linux,name=chipsec
+size=1600MiB,type=linux,name=chipsec
 type=EBD0A0A2-B9E5-4433-87C0-68B6B72699C7,name=data
 EOF
 
 	partprobe "${disk}"
+	# Formatting an external device sometimes fails because the partition
+	# table hasn't propagated (despite partprobe).
+	# Printing the partition table seems to work around it.
+	parted "${disk}" print
 }
 
 format_boot () {
@@ -129,7 +133,9 @@ format_boot () {
 format_data() {
 	local data=${1}
 
-	mkfs.vfat -n DATA ${data}
+	# Ensure FAT32 to allow partition resizing if a 2GB image is copied to
+	# a larger USB key.
+	mkfs.vfat -n DATA -F 32 "${data}"
 }
 
 format_root () {
@@ -296,8 +302,8 @@ main () {
 	data="${disk}${sep}3"
 
 
-	echo "Using ${root} as root partition"
 	echo "Using ${boot} as boot partition"
+	echo "Using ${root} as root partition"
 	echo "Using ${data} as data partition"
 	format_boot "${boot}"
 	format_root "${root}"
