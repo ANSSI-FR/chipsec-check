@@ -209,7 +209,7 @@ install_debian () {
 
 	if [ -n "${extra_packages}" ];
 	then
-		do_chroot apt -y install "${extra_packages}"
+		do_chroot apt -y install ${extra_packages}
 	fi
 
 	do_chroot apt clean
