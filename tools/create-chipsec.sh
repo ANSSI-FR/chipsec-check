@@ -198,7 +198,7 @@ install_debian () {
 	mount -o bind /dev "${mount_point}"/dev
 
 	do_chroot apt -y install systemd linux-image-amd64 grub-efi iproute2
-	do_chroot apt -y install build-essential linux-headers-amd64
+	do_chroot apt -y install build-essential linux-headers-amd64 pahole
 	do_chroot apt -y install python3 python3-dev python3-setuptools
 	do_chroot apt -y install vim-tiny sed nasm pciutils fwupd lshw usbutils
 	do_chroot apt -y install tpm2-tools cpuid msr-tools dmidecode
