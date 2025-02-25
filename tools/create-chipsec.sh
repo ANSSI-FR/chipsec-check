@@ -141,7 +141,7 @@ part_disk () {
 
 	sfdisk -q "${disk}" << EOF
 label: gpt
-size=100MiB,type=uefi,name=esp,bootable
+size=256MiB,type=uefi,name=esp,bootable
 size=3000MiB,type=linux,name=chipsec
 type=EBD0A0A2-B9E5-4433-87C0-68B6B72699C7,name=data
 EOF
