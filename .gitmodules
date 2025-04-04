@@ -1,0 +1,24 @@
+[submodule "third-party/sbctl"]
+	path = third-party/sbctl
+	url = https://github.com/foxboron/sbctl.git
+[submodule "third-party/converged-security-suite"]
+	path = third-party/converged-security-suite
+	url = https://github.com/9elements/converged-security-suite
+[submodule "third-party/fwhunt"]
+	path = third-party/fwhunt
+	url = https://github.com/binarly-io/fwhunt
+[submodule "third-party/fwhunt-scan"]
+	path = third-party/fwhunt-scan
+	url = https://github.com/binarly-io/fwhunt-scan
+[submodule "third-party/Platbox"]
+	path = third-party/Platbox
+	url = https://github.com/IOActive/Platbox
+[submodule "third-party/uefisettings"]
+	path = third-party/uefisettings
+	url = https://github.com/linuxboot/uefisettings
+[submodule "third-party/setup_var.efi"]
+	path = third-party/setup_var.efi
+	url = https://github.com/datasone/setup_var.efi
+[submodule "third-party/chipsec"]
+	path = third-party/chipsec
+	url = https://github.com/chipsec/chipsec.git

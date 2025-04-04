@@ -1,0 +1,54 @@
+#!/bin/bash
+#
+# SPDX-FileCopyrightText: 2025 ANSSI
+# SPDX-License-Identifier: BSD-2-Clause
+
+systemmanufacturer=$(dmidecode --string system-manufacturer | tr " " _)
+productname=$(dmidecode --string system-product-name | tr " " _)
+systemversion=$(dmidecode --string system-version | tr " " _)
+biosversion=$(dmidecode --string bios-version | tr " " _)
+
+if [ -z "$1" ];
+then
+    dir="/srv/${systemmanufacturer}/${productname}_${systemversion}"
+else
+    dir="$1"
+fi
+bios="${dir}/bios"
+logs="${dir}/logs"
+mkdir -p "$bios" "$logs"
+{
+echo "Dumping BIOS of ${systemmanufacturer} ${productname} ${systemversion}, BIOS ${biosversion}"
+
+# Disable kernel messages to the console
+# https://askubuntu.com/a/97318
+dmesg -n 1
+
+chipsec_util -v spi dump "${bios}/spibios_chipsec_v${biosversion}.bin" 
+
+if grep -q AuthenticAMD /proc/cpuinfo; then
+    # AMD
+    dump-mtd-ifd.py --filename="${bios}/spibios_mtd_v${biosversion}.bin"
+    chipsec_util mem read 0x0 0xFFFFF   "${bios}/spibios_chipsec_mem1_v${biosversion}.bin"
+chipsec_util mem read 0xFF000000 0xFFFFFF  "${bios}/spibios_chipsec_mem2_v${biosversion}.bin"
+chipsec_util mem read 0xFD00000000 0x3FFFFFF   "${bios}/spibios_chipsec_mem3_v${biosversion}.bin"
+else
+    # Intel
+    chipsec_util -v spi dump "${bios}/spibios_chipsec_v${biosversion}.bin" 
+fi
+
+# Enable only if the other methods don't work - SLOW
+if [[ "$FAST_MODE" -ne 1 ]]; then
+    insmod /usr/local/lib/kernetix_km.ko
+    printf "dump_spi %s/spibios_platbox_v%s.bin\nexit" "${bios}" "${biosversion}" | platbox_cli cli
+    rmmod kernetix_km
+fi
+
+for image in  "${bios}"/spibios_*.bin
+do
+	echo "*** fwhunt_scan_analyzer.py scan-firmware -d /usr/local/lib/fwhunt/rules ${image} ***" >> "${bios}/fwhunt.txt"
+	fwhunt_scan_analyzer.py scan-firmware -d /usr/local/lib/fwhunt/rules "$image" >> "${bios}/fwhunt.txt"
+done
+} 2>&1 | tee "${logs}/dump_bios.txt"
+
+ls -lsth "${bios}"/*

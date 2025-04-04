@@ -1,0 +1,68 @@
+#!/bin/bash
+#
+# SPDX-FileCopyrightText: 2025 ANSSI
+# SPDX-License-Identifier: BSD-2-Clause
+
+set -e
+
+## Vendor Python dependencies
+
+PIP_CACHE_DIR="/var/cache/pip"
+export PIP_CACHE_DIR
+
+mkdir -p "$PIP_CACHE_DIR"
+
+pip install -r "${SRCDIR}/third-party/fwhunt-scan/requirements.txt"
+
+# For the rest, we only need to prepare the build image, not the final one.
+[ "$1" == "build" ] || exit 0
+
+## Vendor Go dependencies
+
+GOPATH="/var/local/golang"
+export GOPATH
+GOCACHE="/var/cache/go-build"
+export GOCACHE
+# Work around go dependencies that may be removed from upstream repositories
+# https://github.com/9elements/converged-security-suite/issues/365
+export GOPROXY="https://proxy.golang.org"
+
+mkdir -p "$GOPATH"
+mkdir -p "$GOCACHE"
+
+pushd "${SRCDIR}/third-party/sbctl"
+go mod vendor -o "${GOPATH}/vendor/sbctl"
+popd
+
+pushd "${SRCDIR}/third-party/converged-security-suite"
+go mod vendor -o "${GOPATH}/vendor/converged-security-suite"
+popd
+
+## Install Rust, Cargo and the required toolchains (x86 and uefi)
+
+CARGO_HOME="/var/local/cargo"
+export CARGO_HOME
+
+mkdir -p "$CARGO_HOME"
+
+rustup-init -y -t x86_64-unknown-uefi
+source "${CARGO_HOME}/env"
+
+## Vendor Rust dependencies
+
+cat > "${CARGO_HOME}/config.toml" << EOF
+[source.crates-io]
+replace-with = "vendored-sources"
+
+[source.vendored-sources]
+directory = "${CARGO_HOME}/vendor"
+EOF
+
+pushd "${SRCDIR}/third-party/uefisettings"
+cargo vendor --versioned-dirs --no-delete  "${CARGO_HOME}/vendor"
+popd
+
+pushd "${SRCDIR}/third-party/setup_var.efi"
+cargo vendor --versioned-dirs --no-delete "${CARGO_HOME}/vendor"
+popd
+

@@ -1,0 +1,50 @@
+#!/bin/bash
+#
+# SPDX-FileCopyrightText: 2025 ANSSI
+# SPDX-License-Identifier: BSD-2-Clause
+
+set -e
+
+# Do not put the tools in /EFI/BOOT because HelloWorld would be signed by default.
+mkdir -p /efi/EFI/Tools
+cp /usr/share/efitools/efi/{KeyTool,HelloWorld}.efi /efi/EFI/Tools/
+cp /usr/share/edk2/ovmf/Shell.efi /efi/EFI/Tools/
+# Do not add a loader entry for setup_var, it must be launched from the Shell.
+mv /usr/local/bin/setup_var.efi /efi/EFI/Tools/
+
+# Set timezone to Paris
+ln -s ../usr/share/zoneinfo/Europe/Paris /etc/localtime
+
+# Bootloader is already signed by mkosi, nothing to do.
+
+# Sign KeyTool, but do NOT sign HelloWorld, we want to be able to test that
+# unsigned binaries fail to load
+/usr/local/bin/sbctl sign -s /efi/EFI/Tools/KeyTool.efi
+/usr/local/bin/sbctl sign -s /efi/EFI/Tools/Shell.efi
+/usr/local/bin/sbctl sign -s /efi/EFI/Tools/setup_var.efi
+/usr/local/bin/sbctl sign -s /efi/EFI/Tools/Python.efi
+
+# Sign chipsec kernel module
+# Note that signing kernel module needs to be done with a MOK, not a UEFI SecureBoot key:
+# https://lore.kernel.org/all/20220126025834.255493-1-eric.snowberg@oracle.com/
+# However, most distributions (including Fedora used here) cary patches to allow using SB keys:
+# https://gitlab.com/cki-project/kernel-ark/-/commit/5850c93175b9d2e1081873f4bbe08dead202cb08
+# We keep things simple here to avoid the additional manual step of enrolling a separate MOK
+# and setting up a shim with systemd-boot.
+$(find /usr/src/kernels -maxdepth 3 -name sign-file) sha256 /var/lib/sbctl/keys/db/db.{key,pem} $(find /usr/local -name "chipsec.ko")
+# Sign Platbox kernel module for the same reason
+$(find /usr/src/kernels -maxdepth 3 -name sign-file) sha256 /var/lib/sbctl/keys/db/db.{key,pem} $(find /usr/local -name "kernetix_km.ko")
+
+# Put Authenticated Updates in /efi/loader/keys so that it can be picked up by
+# systemd auto-enrollment (https://github.com/systemd/systemd/pull/20255)
+mkdir -p /efi/loader/keys/chipsec-check
+cp /var/lib/sbctl/keys/*/*.auth /efi/loader/keys/chipsec-check
+
+# Magic location for HP "import custom keys" enroll feature
+# Disabled because we'd rather test they do not break standard-compliant workflows
+# mkdir -p /efi/EFI/HP
+# cp /var/lib/sbctl/keys/PK/PK.auth /efi/EFI/HP/PK.bin
+# cp /var/lib/sbctl/keys/KEK/KEK.auth /efi/EFI/HP/KEK.bin
+# cp /var/lib/sbctl/keys/db/db.auth /efi/EFI/HP/DB.bin
+# cp /var/lib/sbctl/keys/dbx/dbx.auth /efi/EFI/HP/DBX.bin
+

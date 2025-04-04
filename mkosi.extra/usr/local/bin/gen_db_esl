@@ -1,0 +1,25 @@
+#!/bin/bash
+#
+# SPDX-FileCopyrightText: 2025 ANSSI
+# SPDX-License-Identifier: BSD-2-Clause
+#
+# Usage: ./gen_db_esl 100 db.esl
+#
+# Generate an EFI Signature List containing N identical entries, corresponding
+# to the hash of an empty file, with a random owner GUID.
+# Works for a DB or a DBX, but not for a KEK/PK (which can only contain
+# certificates, not hashes)
+
+LSIZE=${1:-}
+FILE=${2:-}
+(
+# Write the ESL manually as a hexdump, and call xxd to convert it to a binary file
+# Some fixed header
+printf "26 16 C4 C1 4C 50 92 40 AC A9 41 F9 36 93 43 28"
+# The size of the list (= number of hashes)
+printf "%0.8x\n" $((28 + 48 * LSIZE))|perl -nlE 'say reverse unpack "(A2)*"'
+# Some padding
+printf "00 00 00 00 30 00 00 00"
+# As many vendor guid/hash couples as necessary to fill the list
+yes "$(systemd-id128 new)" "$(sha256sum /dev/null |cut -c1-64)" | head -n "${LSIZE}"
+) | xxd -r -p > "$FILE"

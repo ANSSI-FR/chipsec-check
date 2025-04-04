@@ -1,0 +1,2 @@
+# Disable PC speaker (terminal beep)
+blacklist snd_pcsp

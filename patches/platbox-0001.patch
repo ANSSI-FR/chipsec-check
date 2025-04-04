@@ -1,0 +1,70 @@
+From: Gabriel Kerneis <gabriel.kerneis@ssi.gouv.fr>
+Date: Mon, 11 Mar 2024 17:24:38 +0100
+Subject: [PATCH] Output success/error messages to stdout instead of stderr
+
+Fixes IOActive/Platbox#10
+
+Signed-off-by: Gabriel Kerneis <gabriel.kerneis@ssi.gouv.fr>
+---
+ PlatboxLib/src/global.cpp | 12 ++++++------
+ 1 file changed, 6 insertions(+), 6 deletions(-)
+
+diff --git a/PlatboxLib/src/global.cpp b/PlatboxLib/src/global.cpp
+index b51dc19..4fc719f 100644
+--- a/PlatboxLib/src/global.cpp
++++ b/PlatboxLib/src/global.cpp
+@@ -7,7 +7,7 @@ void debug_print(const char *fmt, ...) {
+     if (DEBUG_MODE) {
+         va_list ap;
+         va_start(ap, fmt);
+-        vfprintf(stderr, fmt, ap);
++        vfprintf(stdout, fmt, ap);
+         va_end(ap);
+     }
+ }
+@@ -31,7 +31,7 @@ void print_green(const char *fmt, ...) {
+         SetConsoleTextAttribute(hConsole, FOREGROUND_GREEN);
+         va_list ap;
+         va_start(ap, fmt);
+-        vfprintf(stderr, fmt, ap);
++        vfprintf(stdout, fmt, ap);
+         va_end(ap);
+ 
+         SetConsoleTextAttribute(hConsole, FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE);
+@@ -42,7 +42,7 @@ void print_green(const char *fmt, ...) {
+ 
+         va_list ap;
+         va_start(ap, fmt);
+-        vfprintf(stderr, _aux_print_buff, ap);
++        vfprintf(stdout, _aux_print_buff, ap);
+         va_end(ap);
+ 
+     #endif
+@@ -55,7 +55,7 @@ void print_red(const char *fmt, ...) {
+         SetConsoleTextAttribute(hConsole, FOREGROUND_RED);
+         va_list ap;
+         va_start(ap, fmt);
+-        vfprintf(stderr, fmt, ap);
++        vfprintf(stdout, fmt, ap);
+         va_end(ap);
+ 
+         SetConsoleTextAttribute(hConsole, FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE);
+@@ -66,7 +66,7 @@ void print_red(const char *fmt, ...) {
+ 
+         va_list ap;
+         va_start(ap, fmt);
+-        vfprintf(stderr, _aux_print_buff, ap);
++        vfprintf(stdout, _aux_print_buff, ap);
+         va_end(ap);
+ 
+     #endif
+@@ -352,4 +352,4 @@ void doSleep(UINT64 milliseconds) {
+ 	#else
+ 		usleep(milliseconds * 1000); // convert to ms to us
+ 	#endif
+-}
+\ No newline at end of file
++}
+-- 
+2.43.0
+

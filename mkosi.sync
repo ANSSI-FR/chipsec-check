@@ -1,0 +1,8 @@
+#!/bin/bash
+#
+# SPDX-FileCopyrightText: 2025 ANSSI
+# SPDX-License-Identifier: BSD-2-Clause
+
+set -e
+
+git submodule update --init --recursive

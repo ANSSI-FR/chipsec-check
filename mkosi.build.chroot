@@ -1,0 +1,94 @@
+#!/bin/bash
+#
+# SPDX-FileCopyrightText: 2025 ANSSI
+# SPDX-License-Identifier: BSD-2-Clause
+
+set -e
+
+mkdir -p "${DESTDIR}/usr/local/bin"
+mkdir -p "${DESTDIR}/usr/local/lib"
+
+GOPATH="/var/local/golang"
+export GOPATH
+GOCACHE="/var/cache/go-build"
+export GOCACHE
+
+PIP_CACHE_DIR="/var/cache/pip"
+export PIP_CACHE_DIR
+
+CARGO_HOME="/var/local/cargo"
+export CARGO_HOME
+source "${CARGO_HOME}/env"
+
+# Point chipsec to the image's kernel otherwise it will try to locate it based
+# on the host kernel version.
+KSRC=$(find /lib/modules -maxdepth 2 -name build)
+export KSRC
+echo KSRC="$KSRC"
+
+## Platbox
+pushd "${SRCDIR}/third-party/Platbox"
+# Patch the sources, they are so broken...
+git config user.email "gabriel.kerneis@ssi.gouv.fr"
+git config user.name "Gabriel Kerneis"
+git reset --hard origin/main
+git am ${SRCDIR}/patches/platbox-*.patch
+# Build the kernel driver
+pushd PlatboxDrv/linux/driver
+make
+cp kernetix_km.ko "${DESTDIR}/usr/local/lib"
+popd
+# Build the CLI tool
+rm -rf build/
+mkdir -p build
+pushd build
+cmake ..
+make
+cp PlatboxClient/platbox_cli "${DESTDIR}/usr/local/bin"
+popd
+popd
+
+## sbctl
+pushd "${SRCDIR}/third-party/sbctl"
+mkdir -p vendor
+mount --bind "${GOPATH}/vendor/sbctl" vendor
+make sbctl
+cp sbctl "${DESTDIR}/usr/local/bin"
+umount vendor
+popd
+
+## fwhunt-scan
+pip install --no-build-isolation "${SRCDIR}/third-party/fwhunt-scan" --root "${DESTDIR}"
+mkdir -p "${DESTDIR}/usr/local/lib/fwhunt"
+cp -r "${SRCDIR}/third-party/fwhunt/rules" "${DESTDIR}/usr/local/lib/fwhunt"
+
+## Chipsec
+pip install --no-build-isolation "${SRCDIR}/third-party/chipsec" --root "${DESTDIR}" --no-warn-script-location
+
+# Install the UEFI version of chipsec (including UEFI Python)
+unzip "${SRCDIR}/third-party/chipsec/__install__/UEFI/chipsec_py368_uefi_x64.zip" -d "${DESTDIR}/efi"
+cp -r "${SRCDIR}/third-party/chipsec" "${DESTDIR}/efi"
+
+## converged-security-suite
+pushd "${SRCDIR}/third-party/converged-security-suite"
+mkdir -p vendor/
+mount --bind "${GOPATH}/vendor/converged-security-suite" vendor/
+mkdir -p bin
+rm -f bin/*
+for d in cmd/{core,exp}/*; do
+        _binary=$(basename "${d}")
+        go build -o bin/"${_binary}" "${d}"/*.go || echo "${_binary}: build failed!"
+done
+cp bin/* "${DESTDIR}/usr/local/bin"
+umount vendor/
+popd
+
+## uefisettings
+pushd "${SRCDIR}/third-party/uefisettings"
+cargo install --path . --root "${DESTDIR}/usr/local"
+popd
+
+## setup_var.efi
+pushd "${SRCDIR}/third-party/setup_var.efi"
+cargo install --path . --root "${DESTDIR}/usr/local"
+popd

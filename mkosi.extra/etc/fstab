@@ -1,0 +1,2 @@
+LABEL=SRV /srv vfat defaults 0 2
+LABEL=EFI /efi vfat defaults 0 2

@@ -1,0 +1,94 @@
+#!/bin/bash
+#
+# SPDX-FileCopyrightText: 2025 ANSSI
+# SPDX-License-Identifier: BSD-2-Clause
+
+systemmanufacturer=$(dmidecode --string system-manufacturer | tr " " _)
+productname=$(dmidecode --string system-product-name | tr " " _)
+systemversion=$(dmidecode --string system-version | tr " " _)
+biosversion=$(dmidecode --string bios-version | tr " " _)
+
+if [ -z "$1" ];
+then
+    dir="/srv/${systemmanufacturer}/${productname}_${systemversion}"
+else
+    dir="$1"
+fi
+hw="${dir}/hardware"
+bios="${dir}/bios"
+logs="${dir}/logs"
+mkdir -p "$hw" "$bios" "$logs"
+
+{
+export NO_COLOR=1
+echo "Dumping state of ${systemmanufacturer} ${productname} ${systemversion}, BIOS ${biosversion}"
+
+dmesg > "${logs}/dmesg.txt"
+journalctl -b 0 > "${logs}/journal.txt"
+
+lshw > "${hw}/lshw.txt"
+lsusb > "${hw}/lsusb.txt"
+lspci > "${hw}/lspci.txt"
+lspci -vvvnn >> "${hw}/lspci.txt"
+dmidecode --dump-bin "${hw}/dmidecode.bin"
+dmidecode > "${hw}/dmidecode.txt"
+lscpu > "${hw}/lscpu.txt"
+journalctl -b 0 | grep -E -i 'iommu|amd-vi|vt-d|dmar' > "${hw}/iommu.txt"
+find /sys/class/iommu >>  "${hw}/iommu.txt"
+{ tpm2_getcap properties-fixed; tpm2_getcap properties-variable; tpm2_getcap pcrs; tpm2_getcap commands; } > "${hw}/tpm2.txt"
+
+fwupdmgr get-devices > "${bios}/fwupd.txt"
+fwupdmgr get-devices --json > "${bios}/fwupd.json"
+fwupdmgr --version > "${bios}/hsi.txt"
+fwupdmgr security >> "${bios}/hsi.txt"
+fwupdmgr security --json > "${bios}/hsi.json"
+bootctl > "${bios}/bootctl.txt"
+sbctl status > "${bios}/sbctl.txt"
+sbctl verify >> "${bios}/sbctl.txt"
+cp /sys/kernel/security/tpm0/binary_bios_measurements "${bios}/tpm_eventlog.bin"
+tpm2_eventlog --eventlog-version=2 "${bios}/tpm_eventlog.bin" > "${bios}/tpm_eventlog.txt"
+tpm2_pcrread > "${bios}/tpm_pcr.txt"
+# Dump secureboot keys
+mkdir -p "${bios}/keys"
+for key in PK KEK db dbx MokList
+do
+        efi-readvar -v ${key} > "${bios}/keys/${key}.txt"
+done
+mkdir -p "${bios}/factory_keys"
+mv /srv/{KEK,PK,db,dbx}.esl "${bios}/factory_keys"
+
+chipsec_main -v -k "${bios}/chipsec_v${biosversion}.md"  &> "${bios}/chipsec.log" 
+
+insmod /usr/local/lib/kernetix_km.ko
+printf "chipset\nexit" | platbox_cli cli &> "${bios}/platbox.txt"
+rmmod kernetix_km
+
+# Dump BIOS attributes
+modprobe think-lmi
+modprobe dell-wmi-sysman
+modprobe hp-bioscfg
+mkdir -p "${bios}/firmware-attributes"
+fwupdmgr get-bios-settings > "${bios}/firmware-attributes/fwupd-attributes.txt"
+fwupdmgr get-bios-settings --json > "${bios}/firmware-attributes/fwupd-attributes.json"
+cp -r /sys/class/firmware-attributes/*/{attributes,authentication} "${bios}/firmware-attributes"
+# Some directories have FAT32-incompatible names, save the plain-text entries in a flat file as well
+grep -R . /sys/class/firmware-attributes/ | cut -d/ -f5- > "${bios}/firmware-attributes.txt"
+# In case the configuration was saved to the flash drive from the HP UEFI menu before booting.
+mv /efi/HpSetup.txt "${bios}"
+# Dump all the efi variables seen by the kernel as well
+mkdir -p "${bios}/efivars"
+cp -r /sys/firmware/efi/efivars/* "${bios}/efivars"
+
+# Firmware Test Suite - SLOW
+if [[ "$FAST_MODE" -ne 1 ]]; then
+    fwts --batch --utils -f -r "${bios}/fwts.txt"
+fi
+
+dmesg > "${logs}/dmesg.txt"
+journalctl -b 0 > "${logs}/journal.txt"
+} 2>&1 | tee "${logs}/dump_system.txt"
+
+# TODO use converged security suite and fwhunt
+
+ls -lstrh "${dir}"/*
+
