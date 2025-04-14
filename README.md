@@ -42,7 +42,7 @@ See third-party/README.md for more tips working with submodules.
 # Generate Secure Boot keys - this is required only once
 ./gen_keys.sh
 # Build the image
-mkosi -i
+mkosi -i build
 # Test the image in qemu
 mkosi qemu
 # Find the /dev device for the USB key
@@ -79,7 +79,7 @@ TODO:
 ## Tips
 
 - Sometimes, mkosi builds get in a confused state and it helps to restart from a clean state. If you want to erase every build artifact and restart from scratch (**including the Secure Boot keys**), run: `git clean -ffdx`.
-- To debug build issues: `mkosi -i --debug --debug-shell`
+- To debug build issues: `mkosi -i --debug --debug-shell build`
 - Do not run `mkosi build` as root, it will probably break the build. If you try to build from within a container, you may need mkosi version >= 25 to build without `sudo` (version 24 and below rely on uid mapping that is hard to get right in this context).
 
 From the chipsec-check live distribution:
