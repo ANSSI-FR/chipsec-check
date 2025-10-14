@@ -92,3 +92,8 @@ popd
 pushd "${SRCDIR}/third-party/setup_var.efi"
 cargo install --path . --root "${DESTDIR}/usr/local"
 popd
+
+## efitools
+pushd "${SRCDIR}/third-party/efitools"
+make install DESTDIR=${DESTDIR}
+popd
