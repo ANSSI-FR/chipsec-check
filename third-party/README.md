@@ -27,9 +27,16 @@ git add chispec
 git commit -m "Update chipsec to v1.13.0"
 ```
 
+# Revert changes to all submodules
+
+```
+git submodule deinit -f .
+git submodule update --init --recursive --checkout
+```
+
 # Clean-up the content of submodules
 
 ```
-sudo git submodule foreach git clean -fdx
+git submodule foreach git clean -fdx
 ```
 
