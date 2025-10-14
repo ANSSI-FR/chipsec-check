@@ -22,3 +22,6 @@
 [submodule "third-party/chipsec"]
 	path = third-party/chipsec
 	url = https://github.com/chipsec/chipsec.git
+[submodule "third-party/efitools"]
+	path = third-party/efitools
+	url = https://github.com/jelly/efitools
