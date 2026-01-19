@@ -21,6 +21,15 @@ the following modes:
     inspect and modify the _SecureBoot_ key list. The key can be used to check
     that the platform will accept new, custom _SecureBoot_ keys
 
+## French Cybersecurity Agency (ANSSI)
+<img src="https://www.sgdsn.gouv.fr/files/styles/ds_image_paragraphe/public/files/Notre_Organisation/logo_anssi.png" alt="ANSSI logo" width="30%">
+
+![badge_repo](https://img.shields.io/badge/ANSSI--FR-chipsec--check-white)
+[![category_badge_external](https://img.shields.io/badge/category-external-%23b556b6)](https://github.com/ANSSI-FR#types-de-projets)
+[![openess_badge_C](https://img.shields.io/badge/code.gouv.fr-published-orange)](https://documentation.ouvert.numerique.gouv.fr/les-parcours-de-documentation/ouvrir-un-projet-num%C3%A9rique/#niveau-ouverture)
+
+*This projet is managed by [ANSSI](https://cyber.gouv.fr/).To find out more, you can go to [page](https://cyber.gouv.fr/open-source-lanssi) dedicated to the ANSSI open source strategy. You can also click on the badges to learn more about their meaning*
+
 ## Cloning the repository
 
 **BEWARE: this repository uses submodules!**
