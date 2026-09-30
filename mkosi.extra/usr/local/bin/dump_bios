@@ -24,14 +24,12 @@ echo "Dumping BIOS of ${systemmanufacturer} ${productname} ${systemversion}, BIO
 # https://askubuntu.com/a/97318
 dmesg -n 1
 
-chipsec_util -v spi dump "${bios}/spibios_chipsec_v${biosversion}.bin" 
-
 if grep -q AuthenticAMD /proc/cpuinfo; then
     # AMD
     dump-mtd-ifd.py --filename="${bios}/spibios_mtd_v${biosversion}.bin"
     chipsec_util mem read 0x0 0xFFFFF   "${bios}/spibios_chipsec_mem1_v${biosversion}.bin"
-chipsec_util mem read 0xFF000000 0xFFFFFF  "${bios}/spibios_chipsec_mem2_v${biosversion}.bin"
-chipsec_util mem read 0xFD00000000 0x3FFFFFF   "${bios}/spibios_chipsec_mem3_v${biosversion}.bin"
+    chipsec_util mem read 0xFF000000 0xFFFFFF  "${bios}/spibios_chipsec_mem2_v${biosversion}.bin"
+    chipsec_util mem read 0xFD00000000 0x3FFFFFF   "${bios}/spibios_chipsec_mem3_v${biosversion}.bin"
 else
     # Intel
     chipsec_util -v spi dump "${bios}/spibios_chipsec_v${biosversion}.bin" 
