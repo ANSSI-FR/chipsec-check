@@ -5,9 +5,8 @@
 
 set -e
 
-# Do not put the tools in /EFI/BOOT because HelloWorld would be signed by default.
+# Do not put the tools in /EFI/BOOT to avoid them being signed by default.
 mkdir -p /efi/EFI/Tools
-cp /usr/share/efitools/efi/{KeyTool,HelloWorld}.efi /efi/EFI/Tools/
 cp /usr/share/edk2/ovmf/Shell.efi /efi/EFI/Tools/
 # Do not add a loader entry for setup_var, it must be launched from the Shell.
 mv /usr/local/bin/setup_var.efi /efi/EFI/Tools/
@@ -17,9 +16,7 @@ ln -s ../usr/share/zoneinfo/Europe/Paris /etc/localtime
 
 # Bootloader is already signed by mkosi, nothing to do.
 
-# Sign KeyTool, but do NOT sign HelloWorld, we want to be able to test that
-# unsigned binaries fail to load
-/usr/local/bin/sbctl sign -s /efi/EFI/Tools/KeyTool.efi
+# Sign relevant tools
 /usr/local/bin/sbctl sign -s /efi/EFI/Tools/Shell.efi
 /usr/local/bin/sbctl sign -s /efi/EFI/Tools/setup_var.efi
 /usr/local/bin/sbctl sign -s /efi/EFI/Tools/Python.efi
