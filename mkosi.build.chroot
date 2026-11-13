@@ -88,10 +88,10 @@ popd
 
 ## uefisettings
 pushd "${SRCDIR}/third-party/uefisettings"
-cargo install --path . --root "${DESTDIR}/usr/local"
+#cargo install --path . --root "${DESTDIR}/usr/local"
 popd
 
 ## setup_var.efi
 pushd "${SRCDIR}/third-party/setup_var.efi"
-cargo install --path . --root "${DESTDIR}/usr/local"
+#cargo install --path . --root "${DESTDIR}/usr/local"
 popd

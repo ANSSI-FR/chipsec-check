@@ -9,7 +9,7 @@ set -e
 mkdir -p /efi/EFI/Tools
 cp /usr/share/edk2/ovmf/Shell.efi /efi/EFI/Tools/
 # Do not add a loader entry for setup_var, it must be launched from the Shell.
-mv /usr/local/bin/setup_var.efi /efi/EFI/Tools/
+#mv /usr/local/bin/setup_var.efi /efi/EFI/Tools/
 
 # Set timezone to Paris
 ln -s ../usr/share/zoneinfo/Europe/Paris /etc/localtime
@@ -18,7 +18,7 @@ ln -s ../usr/share/zoneinfo/Europe/Paris /etc/localtime
 
 # Sign relevant tools
 /usr/local/bin/sbctl sign -s /efi/EFI/Tools/Shell.efi
-/usr/local/bin/sbctl sign -s /efi/EFI/Tools/setup_var.efi
+#/usr/local/bin/sbctl sign -s /efi/EFI/Tools/setup_var.efi
 /usr/local/bin/sbctl sign -s /efi/EFI/Tools/Python.efi
 
 # Sign chipsec kernel module
