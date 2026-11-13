@@ -59,9 +59,9 @@ mv /srv/{KEK,PK,db,dbx}.esl "${bios}/factory_keys"
 
 chipsec_main -v -k "${bios}/chipsec_v${biosversion}.md"  &> "${bios}/chipsec.log" 
 
-insmod /usr/local/lib/kernetix_km.ko
-printf "chipset\nexit" | platbox_cli cli &> "${bios}/platbox.txt"
-rmmod kernetix_km
+#insmod /usr/local/lib/kernetix_km.ko
+#printf "chipset\nexit" | platbox_cli cli &> "${bios}/platbox.txt"
+#rmmod kernetix_km
 
 # Dump BIOS attributes
 modprobe think-lmi

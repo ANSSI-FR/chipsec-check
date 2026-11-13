@@ -30,7 +30,7 @@ ln -s ../usr/share/zoneinfo/Europe/Paris /etc/localtime
 # and setting up a shim with systemd-boot.
 $(find /usr/src/kernels -maxdepth 3 -name sign-file) sha256 /var/lib/sbctl/keys/db/db.{key,pem} $(find /usr/local -name "chipsec.ko")
 # Sign Platbox kernel module for the same reason
-$(find /usr/src/kernels -maxdepth 3 -name sign-file) sha256 /var/lib/sbctl/keys/db/db.{key,pem} $(find /usr/local -name "kernetix_km.ko")
+#$(find /usr/src/kernels -maxdepth 3 -name sign-file) sha256 /var/lib/sbctl/keys/db/db.{key,pem} $(find /usr/local -name "kernetix_km.ko")
 
 # Put Authenticated Updates in /efi/loader/keys so that it can be picked up by
 # systemd auto-enrollment (https://github.com/systemd/systemd/pull/20255)

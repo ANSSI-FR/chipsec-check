@@ -26,27 +26,30 @@ KSRC=$(find /lib/modules -maxdepth 2 -name build)
 export KSRC
 echo KSRC="$KSRC"
 
+git config --global user.name "Gabriel Kerneis"
+git config --global user.email "gabriel.kerneis@ssi.gouv.fr"
+
 ## Platbox
-pushd "${SRCDIR}/third-party/Platbox"
-# Patch the sources, they are so broken...
-git config user.email "gabriel.kerneis@ssi.gouv.fr"
-git config user.name "Gabriel Kerneis"
-git reset --hard origin/main
-git am ${SRCDIR}/patches/platbox-*.patch
-# Build the kernel driver
-pushd PlatboxDrv/linux/driver
-make
-cp kernetix_km.ko "${DESTDIR}/usr/local/lib"
-popd
-# Build the CLI tool
-rm -rf build/
-mkdir -p build
-pushd build
-cmake ..
-make
-cp PlatboxClient/platbox_cli "${DESTDIR}/usr/local/bin"
-popd
-popd
+#pushd "${SRCDIR}/third-party/Platbox"
+## Patch the sources, they are so broken...
+#git config user.email "gabriel.kerneis@ssi.gouv.fr"
+#git config user.name "Gabriel Kerneis"
+#git reset --hard origin/HEAD
+#git am ${SRCDIR}/patches/platbox-*.patch
+## Build the kernel driver
+#pushd PlatboxDrv/linux/driver
+#make
+#cp kernetix_km.ko "${DESTDIR}/usr/local/lib"
+#popd
+## Build the CLI tool
+#rm -rf build/
+#mkdir -p build
+#pushd build
+#cmake ..
+#make
+#cp PlatboxClient/platbox_cli "${DESTDIR}/usr/local/bin"
+#popd
+#popd
 
 ## sbctl
 pushd "${SRCDIR}/third-party/sbctl"

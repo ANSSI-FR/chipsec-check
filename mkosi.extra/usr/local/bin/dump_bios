@@ -36,11 +36,11 @@ else
 fi
 
 # Enable only if the other methods don't work - SLOW
-if [[ "$FAST_MODE" -ne 1 ]]; then
-    insmod /usr/local/lib/kernetix_km.ko
-    printf "dump_spi %s/spibios_platbox_v%s.bin\nexit" "${bios}" "${biosversion}" | platbox_cli cli
-    rmmod kernetix_km
-fi
+#if [[ "$FAST_MODE" -ne 1 ]]; then
+#    insmod /usr/local/lib/kernetix_km.ko
+#    printf "dump_spi %s/spibios_platbox_v%s.bin\nexit" "${bios}" "${biosversion}" | platbox_cli cli
+#    rmmod kernetix_km
+#fi
 
 for image in  "${bios}"/spibios_*.bin
 do
