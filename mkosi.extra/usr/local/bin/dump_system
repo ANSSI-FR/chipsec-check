@@ -70,7 +70,7 @@ modprobe hp-bioscfg
 mkdir -p "${bios}/firmware-attributes"
 fwupdmgr get-bios-settings > "${bios}/firmware-attributes/fwupd-attributes.txt"
 fwupdmgr get-bios-settings --json > "${bios}/firmware-attributes/fwupd-attributes.json"
-cp -r /sys/class/firmware-attributes/*/{attributes,authentication} "${bios}/firmware-attributes"
+cp -Hr /sys/class/firmware-attributes/* "${bios}/firmware-attributes"
 # Some directories have FAT32-incompatible names, save the plain-text entries in a flat file as well
 grep -R . /sys/class/firmware-attributes/ | cut -d/ -f5- > "${bios}/firmware-attributes.txt"
 # In case the configuration was saved to the flash drive from the HP UEFI menu before booting.
